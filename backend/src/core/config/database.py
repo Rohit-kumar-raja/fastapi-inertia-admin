@@ -5,6 +5,7 @@ from .settings import settings
 
 engine = create_async_engine(settings.APP_DATABASE_URL, echo=False)
 # Synchronous engine for migrations or sync tasks (if needed)
+print(settings.APP_DATABASE_URL)
 sync_engine = create_engine(settings.APP_DATABASE_URL.replace("asyncpg", "psycopg2"), echo=False)
 
 AsyncSessionLocal = async_sessionmaker(

@@ -1,7 +1,7 @@
 from uuid import UUID
 from pydantic import Field
 from .privilege_schema import PrivilegeSchema
-from core.common.schemas import BaseSchema
+from ...common.schemas import BaseSchema
 
 
 class RouteSchema(BaseSchema):

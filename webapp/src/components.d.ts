@@ -23,4 +23,7 @@ declare module 'vue' {
     SideBarHeader: typeof import('./components/SideBarHeader.vue')['default']
     Tag: typeof import('primevue/tag')['default']
   }
+  export interface GlobalDirectives {
+    Tooltip: typeof import('primevue/tooltip')['default']
+  }
 }

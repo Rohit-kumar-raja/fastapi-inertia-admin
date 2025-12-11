@@ -7,11 +7,11 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.security.models.route_model import RouteModel
-from core.security.models.role_permission_link_model import RolePermissionLinkModel
+from ..models.route_model import RouteModel
+from ..models.role_permission_link_model import RolePermissionLinkModel
 
 from ..models.role_model import RoleModel
-from core.datatables import DataTables, DataTablesRequest
+from datatables import DataTables, DataTablesRequest, DataTablesResponse
 
 
 class RoleService:

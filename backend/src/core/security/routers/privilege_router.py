@@ -5,7 +5,7 @@ from ..schemas.privilege_schema import PrivilegeSchema
 from ..utils import error_response, response
 from ..services.privilege_service import PrivilegeService
 from .. import get_db
-from core.datatables import DataTablesRequest
+from datatables import DataTablesRequest
 
 privilege_router = APIRouter(prefix="/privileges", tags=["privileges"])
 

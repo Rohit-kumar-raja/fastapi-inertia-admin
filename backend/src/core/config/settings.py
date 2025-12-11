@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     GRAFANA_ADMIN_PASSWORD: str = Field(..., description="Grafana admin password")
 
     model_config = {
-        "env_file": "/app/.env",
+        "env_file": "/home/raja/dev/project/own/conquer/backend/.env",
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }

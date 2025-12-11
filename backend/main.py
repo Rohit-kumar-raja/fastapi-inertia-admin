@@ -21,6 +21,7 @@ from src.core.config.inertia import (
     InertiaDep,
 )
 from src.apps.admin.routes import admin_router
+from src.core.security.routers import security_router
 
 
 app = FastAPI()
@@ -100,3 +101,4 @@ async def some_form(user: UserLogin, inertia: InertiaDep) -> RedirectResponse:
 
 
 app.include_router(admin_router)
+app.include_router(security_router)

@@ -1,5 +1,5 @@
 from pydantic import Field
-from core.common.schemas import BaseSchema
+from ...common.schemas import BaseSchema
 
 
 class PrivilegeSchema(BaseSchema):

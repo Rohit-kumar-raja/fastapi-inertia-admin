@@ -1,0 +1,8 @@
+.venv
+*.pyc
+.env
+uv.lock
+backend/__pycache__/*
+
+
+

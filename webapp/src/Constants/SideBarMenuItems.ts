@@ -44,5 +44,16 @@ export const SideBarMenuItems = ref([
         label: 'Settings',
         icon: 'cog',
         route: '/settings'
+    },
+    {
+        separator: true
+    },
+    {
+        label: 'Administration',
+        icon: 'shield-halved',
+        items: [
+            { label: 'Users', route: '/admin/users' },
+            { label: 'Roles', route: '/admin/roles' }
+        ]
     }
 ]);

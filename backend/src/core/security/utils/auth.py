@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from ..models.user_model import UserModel
 from datetime import datetime, timedelta, timezone
-from core.config.settings import settings
+from ...config.settings import settings
 
 
 SECRET_KEY = settings.APP_SECRET_KEY

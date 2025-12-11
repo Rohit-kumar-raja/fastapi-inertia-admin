@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy.orm import selectinload
 from ..models.privilege_model import PrivilegeModel
-from core.datatables import DataTables, DataTablesRequest
+from datatables import DataTables, DataTablesRequest
 
 
 class PrivilegeService:

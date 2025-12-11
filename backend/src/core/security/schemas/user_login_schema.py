@@ -1,6 +1,6 @@
 from uuid import UUID
 from pydantic import BaseModel, Field
-from core.common.schemas import BaseSchema
+from ...common.schemas import BaseSchema
 
 
 class UserLoginSchema(BaseSchema):

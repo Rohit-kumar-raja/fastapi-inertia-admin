@@ -9,7 +9,6 @@ from core.config.settings import settings
 from core.config.database import Base
 from apps.admin.models import *
 from core.security.models import *
-from apps.scada.models import *
 
 target_metadata = Base.metadata
 

@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 from pydantic import Field
-from core.common.schemas import BaseSchema
+from ...common.schemas import BaseSchema
 
 
 class RoleSchema(BaseSchema):

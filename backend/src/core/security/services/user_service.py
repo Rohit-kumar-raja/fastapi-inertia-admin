@@ -4,20 +4,20 @@ from uuid import UUID
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 
-from core.security.models.route_model import RouteModel
-from core.security.models.role_model import RoleModel
+from ..models.route_model import RouteModel
+from ..models.role_model import RoleModel
 from ..models.user_role_link_model import UserRoleLinkModel
 from ..models.user_model import UserModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils.hash import make_password
-from core.datatables import DataTables, DataTablesRequest
+from datatables import DataTables, DataTablesRequest
 
 
 class UserService:
     """
     UserService handles the business logic and database operations for User.
     """
-
+    
     @staticmethod
     async def create(data: dict, session: AsyncSession) -> Optional[UserModel]:
         """Create a new User."""
@@ -84,10 +84,21 @@ class UserService:
         return False
 
     @staticmethod
-    async def is_unique(username: str, session: AsyncSession) -> bool:
-        statement = select(UserModel).where(UserModel.username == username, UserModel.deleted_at.is_(None))
-        result = await session.execute(statement)
-        return result.scalars().first() is not None
+    async def is_unique(username: str = None, email: str = None, session: AsyncSession = None) -> bool:
+        """Check if username or email already exists."""
+        if username:
+            statement = select(UserModel).where(UserModel.username == username, UserModel.deleted_at.is_(None))
+            result = await session.execute(statement)
+            if result.scalars().first() is not None:
+                return True
+        
+        if email:
+            statement = select(UserModel).where(UserModel.email == email, UserModel.deleted_at.is_(None))
+            result = await session.execute(statement)
+            if result.scalars().first() is not None:
+                return True
+        
+        return False
 
     @staticmethod
     async def get_user_by_username(username: str, session: AsyncSession) -> Optional[UserModel]:

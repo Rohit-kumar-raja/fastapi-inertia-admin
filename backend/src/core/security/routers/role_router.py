@@ -5,7 +5,7 @@ from ..schemas.role_schema import RoleSchema
 from ..services.role_service import RoleService
 from ..utils import error_response, response
 from .. import get_db
-from core.datatables import DataTablesRequest
+from datatables import DataTablesRequest
 
 role_router = APIRouter(prefix="/roles", tags=["roles"])
 

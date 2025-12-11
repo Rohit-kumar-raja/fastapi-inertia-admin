@@ -5,7 +5,7 @@ from ..schemas.user_schema import UserBaseSchema, UserSchema
 from ..services.user_service import UserService
 from ..utils import response, error_response
 from .. import get_db
-from core.datatables import DataTablesRequest
+from datatables import DataTablesRequest
 
 
 user_router = APIRouter(prefix="/users", tags=["users"])
@@ -21,10 +21,14 @@ async def index(session: AsyncSession = Depends(get_db)):
 @user_router.post("", status_code=status.HTTP_201_CREATED, name="admin.user.write")
 async def create(user: UserSchema, session: AsyncSession = Depends(get_db)):
     """Create new data based on the request."""
-    is_unique = await UserService.is_unique(username=user.username, session=session)
-    print(is_unique)
-    if is_unique:
+    # Check username uniqueness
+    if await UserService.is_unique(username=user.username, session=session):
         return error_response(message="Username already exists", status_code=422)
+    
+    # Check email uniqueness
+    if await UserService.is_unique(email=user.email, session=session):
+        return error_response(message="Email already exists", status_code=422)
+    
     response_data = await UserService.create(user.model_dump(), session=session)
     return response(data=response_data, message="Data created successfully")
 
