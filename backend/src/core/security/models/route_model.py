@@ -2,13 +2,8 @@ from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .role_model import RoleModel
-from .role_permission_link_model import RolePermissionLinkModel
-from .privilege_permission_link_model import PrivilegeRouteLinkModel
-from .base_model import BaseModel
-
-if TYPE_CHECKING:
-    from .privilege_model import PrivilegeModel
-
+from .role_model import RolePermissionLinkModel
+from ...common.models.base_model import BaseModel
 
 class RouteModel(BaseModel):
     """
@@ -30,9 +25,4 @@ class RouteModel(BaseModel):
     parent: Mapped[Optional["RouteModel"]] = relationship(back_populates="children", remote_side="RouteModel.id")
 
     roles: Mapped[List[RoleModel]] = relationship(back_populates="routes", secondary=RolePermissionLinkModel.__table__)
-    privileges: Mapped[List["PrivilegeModel"]] = relationship(
-        back_populates="routes", secondary=PrivilegeRouteLinkModel.__table__
-    )
 
-    # def __str__(self):
-    #     return f"{{'name': '{self.name}' }}"

@@ -2,6 +2,7 @@
 import AppSidebar from "@/Components/AppSidebar.vue";
 import AppHeader from "@/Components/AppHeader.vue";
 import { ref } from "vue";
+import AppFooter from "@/Components/AppFooter.vue";
 
 const isMobileSidebarOpen = ref(false);
 const isDesktopSidebarCollapsed = ref(false);
@@ -16,7 +17,7 @@ function toggleSidebar() {
 </script>
 
 <template>
-    <div class="flex h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-300 overflow-hidden">
+    <div class="flex h-screen bg-surface-100 dark:bg-surface-950 transition-colors duration-300 overflow-hidden">
         <!-- Backdrop -->
         <div v-if="isMobileSidebarOpen" class="fixed inset-0 bg-black/50 z-20 lg:hidden"
             @click="isMobileSidebarOpen = false"></div>
@@ -26,9 +27,10 @@ function toggleSidebar() {
 
         <div class="flex-1 flex flex-col min-w-0">
             <AppHeader @toggle-sidebar="toggleSidebar" />
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-1">
                 <slot />
             </main>
+            <AppFooter/>
         </div>
     </div>
 </template>

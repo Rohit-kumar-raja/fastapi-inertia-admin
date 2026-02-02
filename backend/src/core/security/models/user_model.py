@@ -1,9 +1,23 @@
-from typing import List, Optional
-from sqlalchemy import String, Boolean
+from typing import List, Optional,TYPE_CHECKING
+from sqlalchemy import String, Boolean,ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from .user_role_link_model import UserRoleLinkModel
-from .base_model import BaseModel
-from .role_model import RoleModel
+from ...common.models.base_model import BaseModel
+
+if TYPE_CHECKING:
+    from .role_model import RoleModel
+
+
+
+class UserRoleLinkModel(BaseModel):
+    """
+    Association table for the Many-to-Many relationship between User and Role.
+    """
+
+    __tablename__ = "auth_user_roles"
+
+    auth_user_id: Mapped[str] = mapped_column(ForeignKey("auth_user.id"), primary_key=True)
+    auth_role_id: Mapped[str] = mapped_column(ForeignKey("auth_role.id"), primary_key=True)
+
 
 
 class UserModel(BaseModel):
@@ -21,3 +35,4 @@ class UserModel(BaseModel):
 
     # Many-to-Many Relationship with RoleModel
     roles: Mapped[List["RoleModel"]] = relationship(back_populates="users", secondary=UserRoleLinkModel.__table__)
+

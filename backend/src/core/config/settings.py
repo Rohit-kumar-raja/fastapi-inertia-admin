@@ -51,31 +51,10 @@ class Settings(BaseSettings):
     PGADMIN_SERVER_PORT: int = Field(..., description="PGAdmin server port")
     PGADMIN_CONTAINER: str = Field(..., description="PGAdmin container")
 
-    # ---------------- REDIS ----------------
-    REDIS_CONTAINER: str = Field(..., description="Redis container name")
-    REDIS_PORT: int = Field(..., description="Redis port")
-    REDIS_VOLUME: str = Field(..., description="Redis volume")
-    REDIS_HOST: str = "redis"
 
-    # ---------------- INFLUXDB ----------------
-    INFLUX_CONTAINER: str = Field(..., description="InfluxDB container name")
-    INFLUX_PORT: int = Field(..., description="InfluxDB exposed port")
-    INFLUX_VOLUME_DATA: str = Field(..., description="InfluxDB data volume name")
-    INFLUX_VOLUME_CONFIG: str = Field(..., description="InfluxDB config volume name")
-    INFLUX_URL: str = "http://influxdb:8086"
-    INFLUX_TOKEN: str = "tei-admin-token-rotate"
-    INFLUX_ORG: str = "tei"
-    INFLUX_BUCKET: str = "plc_raw"
-
-    # ---------------- GRAFANA ----------------
-    GRAFANA_CONTAINER: str = Field(..., description="Grafana container name")
-    GRAFANA_PORT: int = Field(..., description="Grafana exposed port")
-    GRAFANA_VOLUME: str = Field(..., description="Grafana data volume")
-    GRAFANA_ADMIN_USER: str = Field(..., description="Grafana admin username")
-    GRAFANA_ADMIN_PASSWORD: str = Field(..., description="Grafana admin password")
 
     model_config = {
-        "env_file": "/home/raja/dev/project/own/conquer/backend/.env",
+        "env_file": ".env",
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }

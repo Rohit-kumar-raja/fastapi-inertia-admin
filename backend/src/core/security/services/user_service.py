@@ -6,8 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from ..models.route_model import RouteModel
 from ..models.role_model import RoleModel
-from ..models.user_role_link_model import UserRoleLinkModel
-from ..models.user_model import UserModel
+from ..models.user_model import UserModel,UserRoleLinkModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils.hash import make_password
 from datatables import DataTables, DataTablesRequest

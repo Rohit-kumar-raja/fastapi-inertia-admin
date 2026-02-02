@@ -7,8 +7,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models.route_model import RouteModel
-from ..models.role_permission_link_model import RolePermissionLinkModel
+from ..models.route_model import RouteModel,RolePermissionLinkModel
 
 from ..models.role_model import RoleModel
 from datatables import DataTables, DataTablesRequest, DataTablesResponse
@@ -23,8 +22,8 @@ class RoleService:
     async def create(data: dict, session: AsyncSession) -> Optional[RoleModel]:
         """Create a new Role."""
         try:
-            permission_ids = data.pop("permission_ids", [])
-            routes = await session.execute(select(RouteModel).where(RouteModel.id.in_(permission_ids)))
+            route_ids = data.pop("route_ids", [])
+            routes = await session.execute(select(RouteModel).where(RouteModel.id.in_(route_ids)))
             routes = routes.unique().scalars().all()
             instance = RoleModel(**data)
 
@@ -64,13 +63,13 @@ class RoleService:
         try:
             async with session.begin():
                 data.pop("id", None)
-                if "permission_ids" in data:
-                    permission_ids = data.pop("permission_ids")
+                if "route_ids" in data:
+                    route_ids = data.pop("route_ids")
                     await session.execute(
                         delete(RolePermissionLinkModel).where(RolePermissionLinkModel.auth_role_id == uuid)
                     )
-                    for permission_id in permission_ids:
-                        session.add(RolePermissionLinkModel(auth_route_id=permission_id, auth_role_id=uuid))
+                    for route_id in route_ids:
+                        session.add(RolePermissionLinkModel(auth_route_id=route_id, auth_role_id=uuid))
                 await session.execute(
                     update(RoleModel).where(RoleModel.id == uuid, RoleModel.deleted_at.is_(None)).values(**data)
                 )

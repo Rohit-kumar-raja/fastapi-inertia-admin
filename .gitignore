@@ -2,7 +2,8 @@
 *.pyc
 .env
 uv.lock
-backend/__pycache__/*
+__pycache__
+versions
 
 
 

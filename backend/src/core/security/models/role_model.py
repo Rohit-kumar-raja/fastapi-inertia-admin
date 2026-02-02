@@ -1,13 +1,24 @@
 from typing import List, TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String
-from .user_role_link_model import UserRoleLinkModel
-from .role_permission_link_model import RolePermissionLinkModel
-from .base_model import BaseModel
-
+from sqlalchemy import ForeignKey
+from ...common.models.base_model import BaseModel
+from .user_model import UserRoleLinkModel,UserModel
 if TYPE_CHECKING:
     from .route_model import RouteModel
-    from .user_model import UserModel
+    from .role_model import RolePermissionLinkModel
+
+
+
+class RolePermissionLinkModel(BaseModel):
+    """
+    Association table for the Many-to-Many relationship between Permission and Role.
+    """
+
+    __tablename__ = "auth_route_role"
+
+    auth_route_id: Mapped[str] = mapped_column(ForeignKey("auth_route.id"), primary_key=True)
+    auth_role_id: Mapped[str] = mapped_column(ForeignKey("auth_role.id"), primary_key=True)
 
 
 class RoleModel(BaseModel):

@@ -5,27 +5,19 @@ from datetime import datetime
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models.privilege_model import PrivilegeModel
-
-from ..models.privilege_permission_link_model import PrivilegeRouteLinkModel
 from ..models.route_model import RouteModel
 
 
-class PermissionService:
+class RouteService:
     """
-    PermissionService handles the business logic and database operations for Permission.
+    RouteService handles the business logic and database operations for Route.
     """
 
     @staticmethod
     async def create(data: dict, session: AsyncSession) -> RouteModel:
         """Create a new Route."""
         try:
-            privilege_ids = data.pop("privilege_ids", [])
-            privileges = await session.execute(select(PrivilegeModel).where(PrivilegeModel.id.in_(privilege_ids)))
-            privileges = privileges.scalars().all()
             instance = RouteModel(**data)
-            instance.privileges = privileges
-
             session.add(instance)
             await session.commit()  # Ensure instance.id is available
             await session.refresh(instance)
@@ -38,9 +30,8 @@ class PermissionService:
     async def get_all(session: AsyncSession) -> List[RouteModel]:
         """Fetch all active and non-deleted Route."""
         statement = (
-            select(RouteModel, RouteModel)
+            select(RouteModel)
             .where(RouteModel.deleted_at.is_(None))
-            .options(selectinload(RouteModel.privileges))
         )
         result = await session.execute(statement)
         routes = result.scalars().unique().all()
@@ -53,7 +44,6 @@ class PermissionService:
             select(RouteModel)
             .where(RouteModel.id == uuid, RouteModel.deleted_at.is_(None))
             .options(
-                selectinload(RouteModel.privileges),
                 selectinload(RouteModel.children).options(
                     selectinload(RouteModel.children)  # This enables n-level deep loading
                 ),
@@ -72,16 +62,15 @@ class PermissionService:
         """Update an existing Permission."""
         async with session.begin():
             data.pop("id", None)
-            if "privilege_ids" in data:
-                privilege_ids = data.pop("privilege_ids")
-                await session.execute(
-                    delete(PrivilegeRouteLinkModel).where(PrivilegeRouteLinkModel.auth_route_id == uuid)
+            await session.execute(
+                update(RouteModel)
+                .where(
+                    RouteModel.id == uuid,
+                    RouteModel.deleted_at.is_(None),
                 )
-                for privilege_id in privilege_ids:
-                    privilege_permission_link = PrivilegeRouteLinkModel(
-                        auth_privilege_id=privilege_id, auth_route_id=uuid
-                    )
-                    session.add(privilege_permission_link)
+                .values(**data)
+            )
+            return await RouteService.get_by_id(uuid, session)
             await session.execute(
                 update(RouteModel)
                 .where(
@@ -122,7 +111,6 @@ class PermissionService:
             .options(
                 selectinload(RouteModel.children),
                 with_loader_criteria(RouteModel, RouteModel.deleted_at.is_(None)),
-                selectinload(RouteModel.privileges),
             )
         )
 

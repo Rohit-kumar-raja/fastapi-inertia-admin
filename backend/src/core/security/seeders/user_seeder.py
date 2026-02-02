@@ -19,25 +19,15 @@ class UserSeeder:
         # Sample data to be inserted into the database
         records = [
             {
-                "username": "rohit",
-                "password": "User@1234",  # Replace with actual hashed password
+                "username": "admin",
+                "email": "admin@conquer.dev",
+                "phone": "1234567890",
+                "is_superuser": True,
+                "is_active": True,
+                "password": "Admin@1234",  # Replace with actual hashed password
             },
-            {
-                "username": "altaf",
-                "password": "User@1234",  # Replace with actual hashed password
-            },
-            {
-                "username": "amrita",
-                "password": "User@1234",  # Replace with actual hashed password
-            },
-            {
-                "username": "yogesh",
-                "password": "User@1234",  # Replace with actual hashed password
-            },
-            {
-                "username": "johndoe",
-                "password": "User@1234",  # Replace with actual hashed password
-            },
+          
+            
         ]
 
         # Insert the data into the database using a loop

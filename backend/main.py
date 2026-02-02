@@ -48,45 +48,6 @@ app.mount(
 )
 
 
-def some_dependency(inertia: InertiaDep) -> None:
-    inertia.share(message="hello from dependency")
-
-
-@app.get("/", response_model=None)
-async def index(inertia: InertiaDep) -> InertiaResponse:
-    props = {
-        "message": "hello from index",
-        "lazy_prop": lazy(lambda: "hello from lazy prop"),
-    }
-    return await inertia.render("Dashboard", props)
-
-
-@app.get("/2", response_model=None)
-async def other_page(inertia: InertiaDep) -> RedirectResponse:
-    inertia.flash("hello from index2 (through flash)", category="message")
-    return RedirectResponse(url="/3")
-
-
-async def get_permissions():
-    # Simulate a data fetch that takes some time to retrieve
-    await asyncio.sleep(2)
-    return ["read", "write", "delete"]
-
-
-async def get_users_data():
-    # Simulate a data fetch that takes some time to retrieve
-    await asyncio.sleep(0.5)
-    return {"user1": "John Doe", "user2": "Jane Doe"}
-
-
-@app.get("/3", response_model=None, dependencies=[Depends(some_dependency)])
-async def other_page_with_flashed_data(inertia: InertiaDep) -> InertiaResponse:
-    props = {
-        "permissions": defer(get_permissions, group="operations"),
-        "usersData": defer(get_users_data, group="users"),
-    }
-    inertia.flash("hello from index3 (through flash)", category="message")
-    return await inertia.render("OtherPage", props)
 
 
 class UserLogin(BaseModel):
@@ -94,10 +55,10 @@ class UserLogin(BaseModel):
     password: str
 
 
-@app.post("/login", response_model=None)
-async def some_form(user: UserLogin, inertia: InertiaDep) -> RedirectResponse:
-    inertia.flash("form submitted", category="message")
-    return inertia.back()
+@app.get("/login", response_model=None)
+async def login_page(inertia: InertiaDep) -> InertiaResponse:
+    return await inertia.render("Login")
+
 
 
 app.include_router(admin_router)
