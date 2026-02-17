@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from src.core.config.inertia import InertiaDep
+from .. import InertiaDep
 from inertia import InertiaResponse
 
 role_routes_router = APIRouter(prefix="/admin/roles", tags=["admin-roles-routes"])

@@ -4,19 +4,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..schemas.role_schema import RoleSchema
 from ..services.role_service import RoleService
 from ..utils import error_response, response
-from .. import get_db
+from .. import get_db,InertiaDep
 from datatables import DataTablesRequest
 
 role_router = APIRouter(prefix="/roles", tags=["roles"])
 
 
 @role_router.get("", status_code=status.HTTP_200_OK, name="admin.role.read")
-async def index(session: AsyncSession = Depends(get_db)):
+async def index(inertia: InertiaDep):
     """Get all the data"""
-    data = await RoleService().get_all(session)
-    if not data:
-        return error_response(message="Data not found", status_code=404)
-    return response(data=data, message="Data fetched successfully")
+    return await inertia.render("Admin/Roles/Index")
 
 
 @role_router.post("", status_code=status.HTTP_201_CREATED, name="admin.role.write")

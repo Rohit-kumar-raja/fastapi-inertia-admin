@@ -22,7 +22,7 @@ const notifications = ref([
     { id: 3, title: 'Task completed successfully', time: '2 hours ago', icon: faCheckCircle, read: true }
 ]);
 
-const userMenuItems = ref([
+const userMenuItems = ref<any>([
     {
         label: 'Profile',
         icon: faUser,
@@ -95,15 +95,17 @@ function markAsRead(id: number) {
 
         <div class="flex items-center gap-2">
             <Button text severity="secondary" size="small"
-                class="hidden lg:flex gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                <font-awesome-icon :icon="faSlidersH" />
-                <span>Manage</span>
+                class="hidden lg:flex hover:bg-surface-100 dark:hover:bg-surface-800" label="Manage">
+                <template #icon>
+                    <font-awesome-icon :icon="faSlidersH" />
+                </template>
             </Button>
 
             <Button text severity="secondary" size="small"
-                class="hidden lg:flex gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                <font-awesome-icon :icon="faShareAlt" />
-                <span>Share</span>
+                class="hidden lg:flex hover:bg-surface-100 dark:hover:bg-surface-800" label="Share">
+                <template #icon>
+                    <font-awesome-icon :icon="faShareAlt" />
+                </template>
             </Button>
 
             <Button text rounded severity="secondary" aria-label="More"

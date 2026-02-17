@@ -186,32 +186,38 @@ onMounted(() => {
                     </div>
                     <div class="flex items-center gap-3">
                         <Button text severity="secondary" size="small"
-                            class="gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="faFilter" />
-                            <span>Filter</span>
+                            class="hover:bg-surface-100 dark:hover:bg-surface-800" label="Filter">
+                            <template #icon>
+                                <font-awesome-icon :icon="faFilter" />
+                            </template>
                         </Button>
                         <Button text severity="secondary" size="small"
-                            class="gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="faSort" />
-                            <span>Sort</span>
+                            class="hover:bg-surface-100 dark:hover:bg-surface-800" label="Sort">
+                            <template #icon>
+                                <font-awesome-icon :icon="faSort" />
+                            </template>
                         </Button>
                         <Button text severity="secondary" size="small"
-                            class="gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="faSearch" />
-                            <span>Search</span>
+                            class="hover:bg-surface-100 dark:hover:bg-surface-800" label="Search">
+                            <template #icon>
+                                <font-awesome-icon :icon="faSearch" />
+                            </template>
                         </Button>
                         <Button text rounded severity="secondary"
                             class="w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800">
                             <font-awesome-icon :icon="faEllipsisH" />
                         </Button>
-                        <Button severity="secondary" outlined size="small" class="gap-2">
-                            <font-awesome-icon :icon="faUpload" />
-                            <span>Export</span>
+                        <Button severity="secondary" outlined size="small" label="Export">
+                            <template #icon>
+                                <font-awesome-icon :icon="faUpload" />
+                            </template>
                         </Button>
                         <Button size="small"
-                            class="gap-2 bg-linear-to-r from-primary-500 to-primary-600 border-0 shadow-md hover:shadow-lg">
-                            <font-awesome-icon :icon="faPlus" />
-                            <span>Add New</span>
+                            class="bg-linear-to-r from-primary-500 to-primary-600 border-0 shadow-md hover:shadow-lg"
+                            label="Add New">
+                            <template #icon>
+                                <font-awesome-icon :icon="faPlus" />
+                            </template>
                         </Button>
                     </div>
                 </div>

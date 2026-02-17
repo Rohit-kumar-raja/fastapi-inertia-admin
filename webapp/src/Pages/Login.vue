@@ -176,9 +176,10 @@ const handleLogin = async () => {
                     <!-- Submit Button -->
                     <Button type="submit"
                         class="w-full py-3.5 mt-2 rounded-xl text-lg font-bold shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-md transition-all duration-300 flex justify-center gap-2 bg-linear-to-r from-primary-600 to-primary-500 border-none"
-                        :loading="loading">
-                        <span>Sign In</span>
-                        <font-awesome-icon :icon="faArrowRight" v-if="!loading" class="animate-pulse-slow" />
+                        :loading="loading" label="Sign In" iconPos="right">
+                        <template #icon>
+                            <font-awesome-icon :icon="faArrowRight" class="animate-pulse-slow" />
+                        </template>
                     </Button>
 
                     <!-- Divider -->

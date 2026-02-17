@@ -22,8 +22,6 @@ manifest_json = (
 )
 
 
-
-
 inertia_config = InertiaConfig(
     templates=templates,
     manifest_json_path=manifest_json,
@@ -34,4 +32,3 @@ inertia_config = InertiaConfig(
     assets_prefix="/src",
     version="2.0",
 )
-InertiaDep = Annotated[Inertia, Depends(inertia_dependency_factory(inertia_config))]

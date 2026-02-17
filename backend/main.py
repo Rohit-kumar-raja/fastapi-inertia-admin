@@ -17,9 +17,9 @@ from inertia import (
     defer,
 )
 from src.core.config.inertia import (
-    inertia_config,
-    InertiaDep,
+    inertia_config
 )
+from src.core.dependencies.inertia_dependency import InertiaDep
 from src.apps.admin.routes import admin_router
 from src.core.security.routers import security_router
 

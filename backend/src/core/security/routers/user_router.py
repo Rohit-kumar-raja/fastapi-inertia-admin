@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..schemas.user_schema import UserBaseSchema, UserSchema
 from ..services.user_service import UserService
 from ..utils import response, error_response
-from .. import get_db
+from .. import get_db,InertiaDep
 from datatables import DataTablesRequest
 
 
@@ -12,10 +12,8 @@ user_router = APIRouter(prefix="/users", tags=["users"])
 
 
 @user_router.get("", status_code=status.HTTP_200_OK, name="admin.user.read")
-async def index(session: AsyncSession = Depends(get_db)):
-    """Get list of all  the data"""
-    data = await UserService.get_all(session=session)
-    return response(data=data, message="Data fetched successfully")
+async def index(inertia:InertiaDep):
+    return inertia.render("Admin/Users/Index")
 
 
 @user_router.post("", status_code=status.HTTP_201_CREATED, name="admin.user.write")
