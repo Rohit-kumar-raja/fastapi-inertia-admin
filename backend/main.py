@@ -1,25 +1,15 @@
 import os
-import asyncio
-
-from pydantic import BaseModel, EmailStr
-
-from fastapi import FastAPI,  Request
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from inertia import (
-    InertiaResponse,
     inertia_version_conflict_exception_handler,
     inertia_request_validation_exception_handler,
     InertiaVersionConflictException,
-    lazy,
-    defer,
 )
-from src.core.config.inertia import (
-    inertia_config
-)
-from src.core.dependencies.inertia_dependency import InertiaDep
+from src.core.config.inertia import inertia_config
 from src.apps.admin.routes import admin_router
 from src.core.security.routers import security_router
 
@@ -34,6 +24,7 @@ app.add_exception_handler(
     RequestValidationError,
     inertia_request_validation_exception_handler,  # type: ignore[arg-type]
 )
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):

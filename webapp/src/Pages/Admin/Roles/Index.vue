@@ -14,6 +14,7 @@ const config = {
     title: "Roles",
     dataApi: admin.ROLES_FILTER_API,
     headers: [
+        {field: "s_no", label: "S.NO", sortable: true},
         { field: "name", label: "Name", sortable: true },
         { field: "description", label: "Description", sortable: true },
         { field: "created_at", label: "Created At", sortable: true },

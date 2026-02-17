@@ -77,7 +77,7 @@ const breadcrumbs = computed(() => {
     if (crumbs.length === 0 || (crumbs[0].label !== 'Dashboard' && crumbs[0].label !== 'Home')) {
         crumbs.unshift({
             label: '',
-            route: '/dashboard',
+            route: '/admin/dashboard',
             icon: faHouse
         });
     }

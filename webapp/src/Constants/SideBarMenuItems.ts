@@ -7,7 +7,7 @@ export const SideBarMenuItems = ref([
     {
         label: 'Dashboard',
         icon: faHouse,
-        route: '/dashboard'
+        route: '/admin/dashboard'
     },
 
     {
