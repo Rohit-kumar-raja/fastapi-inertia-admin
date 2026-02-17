@@ -1,26 +1,23 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import Button from 'primevue/button';
+import Menu from 'primevue/menu';
+import Avatar from 'primevue/avatar';
 import AppBreadCrumb from "./AppBreadCrumb.vue";
+import Notification from "./Notification.vue";
 
 import { useUserStore } from "@/Store/userStore";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-    faBars, faSlidersH, faShareAlt, faEllipsisH, faBell,
-    faSun, faMoon, faUser, faCog, faSignOutAlt,
-    faEnvelope, faCalendar, faCheckCircle
+    faBars, faSlidersH, faShareAlt, faEllipsisH,
+    faSun, faMoon, faUser, faCog, faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
 
 const isDark = ref(false);
 const emit = defineEmits(['toggle-sidebar']);
 const userStore = useUserStore();
 
-const notificationPanel = ref();
 const userMenu = ref();
-
-const notifications = ref([
-    { id: 1, title: 'New message from John', time: '5 min ago', icon: faEnvelope, read: false },
-    { id: 2, title: 'Project deadline approaching', time: '1 hour ago', icon: faCalendar, read: false },
-    { id: 3, title: 'Task completed successfully', time: '2 hours ago', icon: faCheckCircle, read: true }
-]);
 
 const userMenuItems = ref<any>([
     {
@@ -43,8 +40,6 @@ const userMenuItems = ref<any>([
     }
 ]);
 
-const unreadCount = ref(notifications.value.filter(n => !n.read).length);
-
 onMounted(() => {
     // Check if dark mode is already enabled
     isDark.value = document.documentElement.classList.contains('dark');
@@ -61,20 +56,8 @@ function toggleTheme() {
     }
 }
 
-function toggleNotifications(event: Event) {
-    notificationPanel.value.toggle(event);
-}
-
 function toggleUserMenu(event: Event) {
     userMenu.value.toggle(event);
-}
-
-function markAsRead(id: number) {
-    const notification = notifications.value.find(n => n.id === id);
-    if (notification) {
-        notification.read = true;
-        unreadCount.value = notifications.value.filter(n => !n.read).length;
-    }
 }
 </script>
 
@@ -116,46 +99,8 @@ function markAsRead(id: number) {
             <div class="w-px h-6 bg-surface-200 dark:bg-surface-700 mx-2 hidden sm:block"></div>
 
             <!-- Notification Button -->
-            <div class="relative">
-                <Button text rounded severity="secondary" @click="toggleNotifications" aria-label="Notifications"
-                    class="w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800 relative">
-                    <font-awesome-icon :icon="faBell" class="text-lg" />
-                </Button>
-                <Badge v-if="unreadCount > 0" :value="unreadCount" severity="danger" size="small"
-                    class="absolute top-0 right-0 w-[1px] h-[1px] p-0 flex items-center justify-center text-[1px]" />
-            </div>
+            <Notification />
 
-            <Popover ref="notificationPanel" class="w-80">
-                <div class="flex flex-col">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-surface-900 dark:text-surface-0">Notifications</h3>
-                        <Button label="Mark all as read" text size="small" class="text-xs" />
-                    </div>
-                    <div class="flex flex-col gap-2 max-h-96 overflow-y-auto">
-                        <div v-for="notification in notifications" :key="notification.id"
-                            @click="markAsRead(notification.id)" :class="[
-                                'p-3 rounded-lg cursor-pointer transition-colors',
-                                notification.read ? 'bg-surface-50 dark:bg-surface-800' : 'bg-primary-50 dark:bg-primary-900/20'
-                            ]">
-                            <div class="flex items-start gap-3">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center flex-shrink-0">
-                                    <font-awesome-icon :icon="notification.icon"
-                                        class="text-primary-600 dark:text-primary-400" />
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-surface-900 dark:text-surface-0">{{
-                                        notification.title }}</p>
-                                    <p class="text-xs text-surface-500 mt-1">{{ notification.time }}</p>
-                                </div>
-                                <div v-if="!notification.read"
-                                    class="w-2 h-2 rounded-full bg-primary-500 flex-shrink-0 mt-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <Button label="View All Notifications" text class="mt-3 w-full justify-center" size="small" />
-                </div>
-            </Popover>
 
             <!-- Theme Toggle -->
             <Button text rounded severity="secondary" @click="toggleTheme" aria-label="Toggle theme"

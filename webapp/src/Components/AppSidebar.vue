@@ -121,10 +121,9 @@ watch(currentPath, () => {
                             <div class="overflow-hidden">
 
                                 <!-- Tree Line Container -->
-                                <ul class="flex flex-col relative pl-[1.5rem]">
+                                <ul class="flex flex-col relative pl-6">
                                     <!-- Vertical Guide Line -->
-                                    <div
-                                        class="absolute left-[1.5rem] top-0 bottom-4 w-px bg-surface-200 dark:bg-surface-800">
+                                    <div class="absolute left-6 top-0 bottom-4 w-px bg-surface-200 dark:bg-surface-800">
                                     </div>
 
                                     <li v-for="(subItem, subIndex) in item.items" :key="subIndex" class="relative group/sub flex items-center ml-4  px-4 rounded-lg text-sm transition-all duration-200

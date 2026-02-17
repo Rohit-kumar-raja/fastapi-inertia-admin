@@ -64,18 +64,5 @@ app.mount(
 )
 
 
-
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
-
-@app.get("/login", response_model=None)
-async def login_page(inertia: InertiaDep) -> InertiaResponse:
-    return await inertia.render("Login")
-
-
-
 app.include_router(admin_router)
 app.include_router(security_router)
