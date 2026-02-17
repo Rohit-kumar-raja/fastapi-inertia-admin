@@ -27,12 +27,13 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <!-- Global Search -->
-                        <span class="relative" v-if="normalizedConfig.globalFilter?.isEnabled">
-                            <FontAwesomeIcon :icon="faSearch"
-                                class="absolute top-1/2 -translate-y-1/2 left-3 text-surface-400 dark:text-surface-500 text-xs" />
+                        <div v-if="normalizedConfig.globalFilter?.isEnabled"
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 focus-within:ring-2 focus-within:ring-indigo-500/30 focus-within:border-indigo-400 transition-all duration-200">
+                            <FontAwesomeIcon :icon="faSearch" class="text-surface-400 dark:text-surface-500 text-xs" />
                             <InputText placeholder="Search records..." v-model="filters.global.value"
-                                @input="filterData({ offset: 0 })" size="small" class="pl-10" />
-                        </span>
+                                @input="filterData({ offset: 0 })" size="small"
+                                class="border-0! bg-transparent! shadow-none! ring-0! outline-none! p-0! text-sm w-48" />
+                        </div>
 
                         <!-- Toggle Filter Button -->
                         <Button size="small" v-if="normalizedConfig.columnFilter?.isEnabled"
