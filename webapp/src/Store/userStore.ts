@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { admin } from '@/core';
 import axios from 'axios';
 import { router } from '@inertiajs/vue3';
 
@@ -14,7 +15,7 @@ export const useUserStore = defineStore('user', () => {
 
     async function login(credentials: any) {
         try {
-            const response = await axios.post('/api/v1/login', credentials, {
+            const response = await axios.post(admin.LOGIN_API, credentials, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
 

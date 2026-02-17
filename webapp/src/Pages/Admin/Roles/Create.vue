@@ -30,7 +30,7 @@ const errors = ref<any>({});
 
 const loadRoutes = async () => {
     try {
-        const response = await axios.get('/api/v1/routes');
+        const response = await axios.get(admin.ROUTES_API);
         // Transform flat routes to tree structure
         routes.value = transformToTreeNodes(response.data.data);
     } catch (error) {
@@ -70,8 +70,8 @@ const submitForm = async () => {
     );
 
     try {
-        await axios.post('/api/v1/roles', form.value);
-        router.visit('/admin/roles');
+        await axios.post(admin.ROLES_API, form.value);
+        router.visit('/administration/roles');
     } catch (error: any) {
         if (error.response?.data?.message) {
             errors.value.general = error.response.data.message;
@@ -86,7 +86,7 @@ const submitForm = async () => {
 };
 
 const cancel = () => {
-    router.visit('/admin/roles');
+    router.visit('/administration/roles');
 };
 
 onMounted(() => {

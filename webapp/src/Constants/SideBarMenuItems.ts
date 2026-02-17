@@ -55,8 +55,8 @@ export const SideBarMenuItems = ref([
         label: 'Administration',
         icon: faUsers,
         items: [
-            { label: 'Users', route: '/admin/users' },
-            { label: 'Roles', route: '/admin/roles' }
+            { label: 'Users', route: '/admin/administration/users' },
+            { label: 'Roles', route: '/admin/administration/roles' }
         ]
     }
 ]);

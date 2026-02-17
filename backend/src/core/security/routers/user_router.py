@@ -13,7 +13,7 @@ user_router = APIRouter(prefix="/users", tags=["users"])
 
 @user_router.get("", status_code=status.HTTP_200_OK, name="admin.user.read")
 async def index(inertia:InertiaDep):
-    return inertia.render("Admin/Users/Index")
+    return await inertia.render("Admin/Users/Index")
 
 
 @user_router.post("", status_code=status.HTTP_201_CREATED, name="admin.user.write")

@@ -49,7 +49,7 @@ const handleFormSuccess = () => {
 
 const deleteUser = async (user: any) => {
     try {
-        await axios.delete(`/api/v1/users/${user.id}`);
+        await axios.delete(`${admin.USERS_API}/${user.id}`);
         toast.add({ severity: 'success', summary: 'Success', detail: 'User deleted successfully', life: 3000 });
         refreshTable();
     } catch (error) {

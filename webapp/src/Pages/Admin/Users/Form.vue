@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
+import { admin } from '@/core';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
 import InputText from 'primevue/inputtext';
@@ -20,7 +21,7 @@ const roles = ref([]);
 const errors = ref<any>({});
 const isEditing = ref(false);
 
-const form = ref({
+const initialForm={
     username: '',
     email: '',
     phone: '',
@@ -28,11 +29,13 @@ const form = ref({
     role_ids: [],
     is_active: true,
     is_superuser: false
-});
+}
+
+const form = ref(initialForm);
 
 const loadRoles = async () => {
     try {
-        const response = await axios.get('/api/v1/roles');
+        const response = await axios.get(admin.ROLES_API);
         roles.value = response.data.data;
     } catch (error) {
         console.error('Error loading roles:', error);
@@ -53,15 +56,7 @@ const initForm = () => {
         };
     } else {
         isEditing.value = false;
-        form.value = {
-            username: '',
-            email: '',
-            phone: '',
-            password: '',
-            role_ids: [],
-            is_active: true,
-            is_superuser: false
-        };
+        form.value = initialForm;
     }
     errors.value = {};
 };
@@ -79,10 +74,10 @@ const submitForm = async () => {
             const data: any = { ...form.value };
             if (!data.password) delete data.password;
 
-            await axios.put(`/api/v1/users/${props.user.id}`, data);
+            await axios.put(`${admin.USERS_API}/${props.user.id}`, data);
             toast.add({ severity: 'success', summary: 'Success', detail: 'User updated successfully', life: 3000 });
         } else {
-            await axios.post('/api/v1/users', form.value);
+            await axios.post(admin.USERS_API, form.value);
             toast.add({ severity: 'success', summary: 'Success', detail: 'User created successfully', life: 3000 });
         }
 
