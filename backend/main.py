@@ -3,8 +3,8 @@ import asyncio
 
 from pydantic import BaseModel, EmailStr
 
-from fastapi import FastAPI, Depends
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI,  Request
+from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -34,6 +34,22 @@ app.add_exception_handler(
     RequestValidationError,
     inertia_request_validation_exception_handler,  # type: ignore[arg-type]
 )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors: dict = {}
+    for err in exc.errors():
+        field = err["loc"][-1]
+        message = err["msg"]
+
+        if field not in errors:
+            errors[field] = []
+        errors[field].append(message)
+
+    return JSONResponse(
+        status_code=422,
+        content={"errors": errors, "message": "Validation error", "success": False},
+    )
 
 
 vue_dir = (

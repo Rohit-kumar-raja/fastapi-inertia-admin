@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import AppDataTable from '@/Components/AppDataTable.vue';
 import { admin } from '@/core';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
 
 const tempData = {
-    title: "Tag Groups",
-    dataApi: admin.USERS_API, // API for table fetch
+    title: "Users",
+    dataApi: admin.USERS_FILTER_API, // API for table fetch
     headers: [
         {
             field: "s_no",
@@ -15,12 +14,25 @@ const tempData = {
             class: "w-[5%]",
         },
         {
-            field: "name",
-            label: "Name",
+            field: "username",
+            label: "Username",
         },
+        {
+            field: "email",
+            label: "Email",
+        },
+        {
+            field: "roles",
+            label: "Roles",
+        },
+        {
+            field: "is_active",
+            label: "Status",
+
+        }
     ],
     export: {
-        columns: ["id", "name",],
+        columns: ["id", "email",],
 
     }
 
@@ -30,7 +42,14 @@ const tempData = {
 </script>
 
 <template>
-    <AppDataTable :config="tempData" >
+    <AppDataTable :config="tempData">
 
+        <template #roles="{ data }">
+            <div class="flex gap-2">
+                <Tag v-for="role in data.roles" :key="role.id">
+                    {{ role.name }}
+                </Tag>
+            </div>
+        </template>
     </AppDataTable>
 </template>

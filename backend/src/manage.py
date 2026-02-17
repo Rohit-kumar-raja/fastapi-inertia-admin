@@ -2,7 +2,6 @@ import asyncio
 import subprocess
 import typer
 
-# from fastapi_cli.cli import app
 from fastapi.routing import APIRoute
 from fpcli import app
 

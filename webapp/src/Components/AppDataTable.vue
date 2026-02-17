@@ -244,6 +244,7 @@ const filterData = async (event: Partial<FilterEventType | DataTableFilterEvent>
         first.value = event.first ?? 0
         payload.value = {
             action: "filter",
+            draw: apiCall.value,
             payload: {
                 offset: event.first ?? 0,
                 limit: event.rows ?? normalizedConfig.value.pagination.recordsPerPage,
@@ -274,7 +275,7 @@ const filterData = async (event: Partial<FilterEventType | DataTableFilterEvent>
         });
         const result = response?.data;
 
-        data.value = result?.data.records || [];
+        data.value = result?.data.data || [];
         totalRecords.value = result?.data?.recordsFiltered || 0;
     } catch (err: any) {
         console.error("Load error:", err);
