@@ -1,15 +1,18 @@
 import { ref } from "vue";
+import {
+    faHouse, faFolder, faChartBar, faFile, faBuilding, faUsers, faCog
+} from "@fortawesome/free-solid-svg-icons";
 
 export const SideBarMenuItems = ref([
     {
         label: 'Dashboard',
-        icon: 'house',
+        icon: faHouse,
         route: '/dashboard'
     },
 
     {
         label: 'Projects',
-        icon: 'folder',
+        icon: faFolder,
         items: [
             { label: 'Construction', route: '/projects/construction' },
             { label: 'Maintenance', route: '/projects/maintenance' }
@@ -17,12 +20,12 @@ export const SideBarMenuItems = ref([
     },
     {
         label: 'Analytics',
-        icon: 'chart-bar',
+        icon: faChartBar,
         route: '/analytics'
     },
     {
         label: 'Reports',
-        icon: 'file',
+        icon: faFile,
         route: '/reports'
     },
     {
@@ -30,19 +33,19 @@ export const SideBarMenuItems = ref([
     },
     {
         label: 'Companies',
-        icon: 'building',
+        icon: faBuilding,
         badge: 17,
         route: '/companies'
     },
     {
         label: 'People',
-        icon: 'users',
+        icon: faUsers,
         badge: 164,
         route: '/people'
     },
     {
         label: 'Settings',
-        icon: 'cog',
+        icon: faCog,
         route: '/settings'
     },
     {
@@ -50,7 +53,7 @@ export const SideBarMenuItems = ref([
     },
     {
         label: 'Administration',
-        icon: 'shield-halved',
+        icon: faUsers,
         items: [
             { label: 'Users', route: '/admin/users' },
             { label: 'Roles', route: '/admin/roles' }

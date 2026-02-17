@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { Link } from "@inertiajs/vue3";
 import SideBarHeader from "./SideBarHeader.vue";
 import SideBarFooter from "./SideBarFooter.vue";
 import { SideBarMenuItems } from "@/Constants";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 defineProps<{
     isOpen: boolean,
@@ -63,9 +64,9 @@ function isActive(route: string) {
                             <component :is="item.items ? 'div' : Link" :href="item.route || '#'"
                                 class="flex items-center gap-3 flex-1 min-w-0">
                                 <!-- Icon -->
-                                <div
+                                <div v-if="item.icon"
                                     class="w-8 h-8 rounded-lg bg-surface-0 dark:bg-surface-800 flex items-center justify-center text-surface-500 dark:text-surface-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 group-hover:bg-white dark:group-hover:bg-surface-800 shadow-sm border border-surface-200 dark:border-surface-700 transition-colors shrink-0">
-                                    <font-awesome-icon :icon="['fas', item.icon]" class="text-sm" />
+                                    <font-awesome-icon :icon="item.icon" class="text-sm" />
                                 </div>
 
                                 <!-- Label -->
@@ -87,7 +88,7 @@ function isActive(route: string) {
                             </span>
 
                             <!-- Chevron -->
-                            <font-awesome-icon v-if="item.items" :icon="['fas', 'chevron-right']" :class="[
+                            <font-awesome-icon v-if="item.items" :icon="faChevronRight" :class="[
                                 'text-[10px] text-surface-400 transition-transform duration-200 ml-auto',
                                 isExpanded(item.label) ? 'rotate-90' : 'rotate-0',
                                 isCollapsed ? 'lg:hidden lg:group-hover:block' : 'block'

@@ -21,11 +21,12 @@
     "@primevue/themes": "^4.5.1",
     "@vue/server-renderer": "^3.5.13",
     "chart.js": "^4.5.1",
+    "pinia": "^3.0.4",
     "primevue": "^4.5.3",
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@primevue/auto-import-resolver": "^4.5.1",
+    "@primevue/auto-import-resolver": "^4.5.4",
     "@rushstack/eslint-patch": "^1.10.2",
     "@tailwindcss/vite": "^4.1.17",
     "@tsconfig/node20": "^20.1.4",

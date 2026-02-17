@@ -1,33 +1,36 @@
 <script setup lang="ts">
-import Button from "primevue/button";
-import Badge from "primevue/badge";
-import Popover from "primevue/popover";
-import Menu from "primevue/menu";
-import Avatar from "primevue/avatar";
-import { ref, onMounted } from "vue";
 import AppBreadCrumb from "./AppBreadCrumb.vue";
+
+import { useUserStore } from "@/Store/userStore";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+    faBars, faSlidersH, faShareAlt, faEllipsisH, faBell,
+    faSun, faMoon, faUser, faCog, faSignOutAlt,
+    faEnvelope, faCalendar, faCheckCircle
+} from "@fortawesome/free-solid-svg-icons";
 
 const isDark = ref(false);
 const emit = defineEmits(['toggle-sidebar']);
+const userStore = useUserStore();
 
 const notificationPanel = ref();
 const userMenu = ref();
 
 const notifications = ref([
-    { id: 1, title: 'New message from John', time: '5 min ago', icon: 'envelope', read: false },
-    { id: 2, title: 'Project deadline approaching', time: '1 hour ago', icon: 'calendar', read: false },
-    { id: 3, title: 'Task completed successfully', time: '2 hours ago', icon: 'check-circle', read: true }
+    { id: 1, title: 'New message from John', time: '5 min ago', icon: faEnvelope, read: false },
+    { id: 2, title: 'Project deadline approaching', time: '1 hour ago', icon: faCalendar, read: false },
+    { id: 3, title: 'Task completed successfully', time: '2 hours ago', icon: faCheckCircle, read: true }
 ]);
 
 const userMenuItems = ref([
     {
         label: 'Profile',
-        icon: 'user',
+        icon: faUser,
         command: () => console.log('Profile')
     },
     {
         label: 'Settings',
-        icon: 'cog',
+        icon: faCog,
         command: () => console.log('Settings')
     },
     {
@@ -35,8 +38,8 @@ const userMenuItems = ref([
     },
     {
         label: 'Logout',
-        icon: 'sign-out',
-        command: () => console.log('Logout')
+        icon: faSignOutAlt,
+        command: () => userStore.logout()
     }
 ]);
 
@@ -82,7 +85,7 @@ function markAsRead(id: number) {
             <Button text rounded severity="secondary" aria-label="Menu"
                 class="lg:hidden w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800"
                 @click="emit('toggle-sidebar')">
-                <font-awesome-icon :icon="['fas', 'bars']" class="text-lg" />
+                <font-awesome-icon :icon="faBars" class="text-lg" />
             </Button>
 
 
@@ -93,19 +96,19 @@ function markAsRead(id: number) {
         <div class="flex items-center gap-2">
             <Button text severity="secondary" size="small"
                 class="hidden lg:flex gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                <font-awesome-icon :icon="['fas', 'sliders-h']" />
+                <font-awesome-icon :icon="faSlidersH" />
                 <span>Manage</span>
             </Button>
 
             <Button text severity="secondary" size="small"
                 class="hidden lg:flex gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                <font-awesome-icon :icon="['fas', 'share-alt']" />
+                <font-awesome-icon :icon="faShareAlt" />
                 <span>Share</span>
             </Button>
 
             <Button text rounded severity="secondary" aria-label="More"
                 class="hidden sm:flex w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800">
-                <font-awesome-icon :icon="['fas', 'ellipsis-h']" />
+                <font-awesome-icon :icon="faEllipsisH" />
             </Button>
 
             <div class="w-px h-6 bg-surface-200 dark:bg-surface-700 mx-2 hidden sm:block"></div>
@@ -114,7 +117,7 @@ function markAsRead(id: number) {
             <div class="relative">
                 <Button text rounded severity="secondary" @click="toggleNotifications" aria-label="Notifications"
                     class="w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800 relative">
-                    <font-awesome-icon :icon="['fas', 'bell']" class="text-lg" />
+                    <font-awesome-icon :icon="faBell" class="text-lg" />
                 </Button>
                 <Badge v-if="unreadCount > 0" :value="unreadCount" severity="danger" size="small"
                     class="absolute top-0 right-0 w-[1px] h-[1px] p-0 flex items-center justify-center text-[1px]" />
@@ -135,7 +138,7 @@ function markAsRead(id: number) {
                             <div class="flex items-start gap-3">
                                 <div
                                     class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center flex-shrink-0">
-                                    <font-awesome-icon :icon="['fas', notification.icon]"
+                                    <font-awesome-icon :icon="notification.icon"
                                         class="text-primary-600 dark:text-primary-400" />
                                 </div>
                                 <div class="flex-1 min-w-0">
@@ -155,7 +158,7 @@ function markAsRead(id: number) {
             <!-- Theme Toggle -->
             <Button text rounded severity="secondary" @click="toggleTheme" aria-label="Toggle theme"
                 class="w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800">
-                <font-awesome-icon :icon="['fas', isDark ? 'sun' : 'moon']" class="text-lg" />
+                <font-awesome-icon :icon="isDark ? faSun : faMoon" class="text-lg" />
             </Button>
 
             <!-- User Menu -->
@@ -169,7 +172,7 @@ function markAsRead(id: number) {
                 <template #item="{ item }">
                     <a
                         class="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-800 rounded transition-colors">
-                        <font-awesome-icon v-if="item.icon" :icon="['fas', item.icon]" class="text-surface-400" />
+                        <font-awesome-icon v-if="item.icon" :icon="item.icon" class="text-surface-400" />
                         <span>{{ item.label }}</span>
                     </a>
                 </template>

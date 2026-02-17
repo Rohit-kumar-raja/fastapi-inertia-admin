@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import AdminLayout from "@/Layouts/AdminLayout.vue";
-
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+    faBox, faArrowsRotate, faEllipsisH, faChevronDown,
+    faFilter, faSort, faSearch, faUpload, faPlus
+} from "@fortawesome/free-solid-svg-icons";
 
 const chartData = ref();
 const chartOptions = ref();
@@ -85,8 +88,8 @@ onMounted(() => {
             <div class="flex items-center gap-4 justify-between">
                 <div class="flex items-center gap-4">
                     <div
-                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-primary-500/30">
-                        <font-awesome-icon :icon="['fas', 'box']" />
+                        class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-primary-500/30">
+                        <font-awesome-icon :icon="faBox" />
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-0">House Spectrum Ltd</h1>
@@ -105,7 +108,7 @@ onMounted(() => {
                 <!-- Stats Cards -->
                 <div class="ml-auto flex gap-4">
                     <div
-                        class="px-6 py-3 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/10 border border-emerald-200 dark:border-emerald-800/30">
+                        class="px-6 py-3 rounded-xl bg-linear-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/8 border border-emerald-200 dark:border-emerald-800/30">
                         <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-1 font-medium">Sales</p>
                         <div class="flex items-center gap-2">
                             <span class="text-2xl font-bold text-emerald-900 dark:text-emerald-100">5.3</span>
@@ -113,7 +116,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div
-                        class="px-6 py-3 rounded-xl bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/10 border border-rose-200 dark:border-rose-800/30">
+                        class="px-6 py-3 rounded-xl bg-linear-to-br from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/10 border border-rose-200 dark:border-rose-800/30">
                         <p class="text-xs text-rose-600 dark:text-rose-400 mb-1 font-medium">Profit</p>
                         <div class="flex items-center gap-2">
                             <span class="text-2xl font-bold text-rose-900 dark:text-rose-100">2.4</span>
@@ -121,7 +124,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div
-                        class="px-6 py-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/10 border border-blue-200 dark:border-blue-800/30">
+                        class="px-6 py-3 rounded-xl bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/10 border border-blue-200 dark:border-blue-800/30">
                         <p class="text-xs text-blue-600 dark:text-blue-400 mb-1 font-medium">Customer</p>
                         <div class="flex items-center gap-2">
                             <span class="text-2xl font-bold text-blue-900 dark:text-blue-100">7.8</span>
@@ -151,11 +154,11 @@ onMounted(() => {
                     <div class="flex items-center gap-2">
                         <Button text rounded severity="secondary"
                             class="w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="['fas', 'arrows-rotate']" />
+                            <font-awesome-icon :icon="faArrowsRotate" />
                         </Button>
                         <Button text rounded severity="secondary"
                             class="w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="['fas', 'ellipsis-h']" />
+                            <font-awesome-icon :icon="faEllipsisH" />
                         </Button>
                         <div class="flex bg-surface-100 dark:bg-surface-800 rounded-lg p-1">
                             <Button label="D" text size="small" severity="secondary" class="px-3 py-1 min-w-[32px]" />
@@ -179,35 +182,35 @@ onMounted(() => {
                 <div class="p-4 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <h3 class="font-bold text-surface-900 dark:text-surface-0">All Deals</h3>
-                        <font-awesome-icon :icon="['fas', 'chevron-down']" class="text-sm text-surface-400" />
+                        <font-awesome-icon :icon="faChevronDown" class="text-sm text-surface-400" />
                     </div>
                     <div class="flex items-center gap-3">
                         <Button text severity="secondary" size="small"
                             class="gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="['fas', 'filter']" />
+                            <font-awesome-icon :icon="faFilter" />
                             <span>Filter</span>
                         </Button>
                         <Button text severity="secondary" size="small"
                             class="gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="['fas', 'sort']" />
+                            <font-awesome-icon :icon="faSort" />
                             <span>Sort</span>
                         </Button>
                         <Button text severity="secondary" size="small"
                             class="gap-2 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="['fas', 'search']" />
+                            <font-awesome-icon :icon="faSearch" />
                             <span>Search</span>
                         </Button>
                         <Button text rounded severity="secondary"
                             class="w-10 h-10 hover:bg-surface-100 dark:hover:bg-surface-800">
-                            <font-awesome-icon :icon="['fas', 'ellipsis-h']" />
+                            <font-awesome-icon :icon="faEllipsisH" />
                         </Button>
                         <Button severity="secondary" outlined size="small" class="gap-2">
-                            <font-awesome-icon :icon="['fas', 'upload']" />
+                            <font-awesome-icon :icon="faUpload" />
                             <span>Export</span>
                         </Button>
                         <Button size="small"
-                            class="gap-2 bg-gradient-to-r from-primary-500 to-primary-600 border-0 shadow-md hover:shadow-lg">
-                            <font-awesome-icon :icon="['fas', 'plus']" />
+                            class="gap-2 bg-linear-to-r from-primary-500 to-primary-600 border-0 shadow-md hover:shadow-lg">
+                            <font-awesome-icon :icon="faPlus" />
                             <span>Add New</span>
                         </Button>
                     </div>

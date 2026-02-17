@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+
 defineProps<{
     isCollapsed?: boolean
 }>();
@@ -21,7 +24,7 @@ defineProps<{
                 <p class="text-sm font-bold text-surface-900 dark:text-surface-100 truncate">Ember Crest</p>
                 <p class="text-xs text-surface-500 truncate">Admin</p>
             </div>
-            <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']"
+            <font-awesome-icon :icon="faArrowRightFromBracket"
                 class="text-surface-400 group-hover/profile:text-red-500 transition-colors shrink-0"
                 :class="[isCollapsed ? 'lg:hidden lg:group-hover:block' : 'block']" />
         </div>
