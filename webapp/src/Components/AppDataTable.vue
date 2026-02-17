@@ -12,25 +12,44 @@
             <!-- Header -->
             <template #header>
                 <div class="flex justify-between items-center select-none">
-                    <p class="text-2xl" v-html="normalizedConfig.title ?? 'Datatable'"></p>
-                    <div class="flex gap-2">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
+                            <FontAwesomeIcon :icon="faTableList" />
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-surface-900 dark:text-surface-0 leading-tight"
+                                v-html="normalizedConfig.title ?? 'Datatable'"></h2>
+                            <p class="text-xs text-surface-400 dark:text-surface-500 mt-0.5">
+                                <FontAwesomeIcon :icon="faDatabase" class="mr-1" />{{ totalRecords }} records
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
                         <!-- Global Search -->
                         <span class="relative" v-if="normalizedConfig.globalFilter?.isEnabled">
-                            <i
-                                class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
-                            <InputText placeholder="Search" v-model="filters.global.value"
+                            <FontAwesomeIcon :icon="faSearch"
+                                class="absolute top-1/2 -translate-y-1/2 left-3 text-surface-400 dark:text-surface-500 text-xs" />
+                            <InputText placeholder="Search records..." v-model="filters.global.value"
                                 @input="filterData({ offset: 0 })" size="small" class="pl-10" />
                         </span>
 
                         <!-- Toggle Filter Button -->
                         <Button size="small" v-if="normalizedConfig.columnFilter?.isEnabled"
-                            :icon="isColumnFilter === 'row' ? 'pi pi-filter-slash' : 'pi pi-filter'" severity="contrast"
-                            outlined label="Filter" @click="toggleColumnFilter"> </Button>
+                            :severity="isColumnFilter === 'row' ? 'warn' : 'contrast'"
+                            :outlined="isColumnFilter !== 'row'" :label="isColumnFilter === 'row' ? 'Clear' : 'Filter'"
+                            @click="toggleColumnFilter">
+                            <template #icon>
+                                <FontAwesomeIcon :icon="isColumnFilter === 'row' ? faFilterCircleXmark : faFilter" />
+                            </template>
+                        </Button>
 
                         <!-- Add Record -->
-                        <Button v-if="normalizedConfig.actions?.addRecord?.isEnabled" severity="info" size="small"
-                            label="Add Record" @click="emit('action', { type: 'create' })"> <template #icon>
-                                <FontAwesomeIcon :icon=faPlus />
+                        <Button v-if="normalizedConfig.actions?.addRecord?.isEnabled"
+                            class="bg-linear-to-br! from-indigo-500! to-indigo-700!" size="small" label="Add Record"
+                            @click="emit('action', { type: 'create' })">
+                            <template #icon>
+                                <FontAwesomeIcon :icon="faPlus" />
                             </template>
                         </Button>
                     </div>
@@ -108,7 +127,7 @@ import { type ColumnFilterModel } from '@/Types/AppDataTableFilterType'
 import { type ContextMenuEventType } from '@/Types/ContextMenuEventType'
 import { type FilterEventType } from '@/Types/AppDataTableFilterEventType'
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSearch, faTableList, faFilter, faFilterCircleXmark, faDatabase } from "@fortawesome/free-solid-svg-icons";
 import { router } from "@inertiajs/vue3";
 // import AppDatatableDeleteDialogSummery from "./DataTables/AppDatatableDeleteDialogSummery.vue";
 // import AppDatatableUploadDialog from "./DataTables/AppDatatableUploadDialog.vue";
