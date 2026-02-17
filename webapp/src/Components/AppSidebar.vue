@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 import SideBarHeader from "./SideBarHeader.vue";
 import SideBarFooter from "./SideBarFooter.vue";
 import { SideBarMenuItems } from "@/Constants";
@@ -12,8 +12,6 @@ defineProps<{
 }>();
 
 const emit = defineEmits(['close']);
-
-
 
 const expandedItems = ref<string[]>(['']);
 
@@ -30,10 +28,29 @@ function isExpanded(label: string) {
     return expandedItems.value.includes(label);
 }
 
-// Mock active state logic
-function isActive(route: string) {
-    return route === '/dashboard';
+// Active state logic
+const page = usePage();
+const currentPath = computed(() => page.url ? page.url.split(/[?#]/)[0] : '');
+
+function isActive(route?: string) {
+    if (!route || !currentPath.value) return false;
+    return currentPath.value === route || currentPath.value.startsWith(route + '/');
 }
+
+function isChildActive(children: any[]) {
+    return children.some(child => isActive(child.route));
+}
+
+// Auto-expand groups with active children and keep them in sync with URL
+watch(currentPath, () => {
+    SideBarMenuItems.value.forEach(item => {
+        if (item.items && isChildActive(item.items)) {
+            if (!expandedItems.value.includes(item.label)) {
+                expandedItems.value.push(item.label);
+            }
+        }
+    });
+}, { immediate: true });
 </script>
 
 <template>
@@ -59,7 +76,7 @@ function isActive(route: string) {
                             'group flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all duration-200 select-none border border-transparent',
                             // Hover effect for the whole row
                             'hover:bg-surface-100 dark:hover:bg-surface-900',
-                            (item.route && isActive(item.route)) ? 'bg-surface-100 dark:bg-surface-900' : ''
+                            (item.route && isActive(item.route)) || (item.items && isChildActive(item.items)) ? 'bg-surface-100 dark:bg-surface-900' : ''
                         ]">
                             <component :is="item.items ? 'div' : Link" :href="item.route || '#'"
                                 class="flex items-center gap-3 flex-1 min-w-0">
@@ -111,12 +128,15 @@ function isActive(route: string) {
                                     </div>
 
                                     <li v-for="(subItem, subIndex) in item.items" :key="subIndex" class="relative group/sub flex items-center ml-4  px-4 rounded-lg text-sm transition-all duration-200
-                                                   text-surface-500 dark:text-surface-400 
                                                    
                                                    hover:bg-primary-50 dark:hover:bg-primary-900/20 
                                                    hover:text-primary-700 dark:hover:text-primary-300
                                                    
-                                                   hover:translate-x-0.5">
+                                                   hover:translate-x-0.5" :class="[
+                                                    isActive(subItem.route)
+                                                        ? 'text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/20 font-medium'
+                                                        : 'text-surface-500 dark:text-surface-400'
+                                                ]">
 
                                         <div
                                             class="absolute left-0 top-1/2 w-4 h-px bg-surface-200 dark:bg-surface-800 -translate-y-1/2">
