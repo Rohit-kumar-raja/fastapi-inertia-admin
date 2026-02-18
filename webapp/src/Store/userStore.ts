@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { admin } from '@/core';
+import { admin, deleteCookie } from '@/core';
 import axios from 'axios';
 import { router } from '@inertiajs/vue3';
 
@@ -29,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
                 router.visit('/admin/dashboard');
             }
             return response;
-        } catch (error:any) {
+        } catch (error: any) {
             throw error;
         }
     }
@@ -39,9 +39,9 @@ export const useUserStore = defineStore('user', () => {
         delete axios.defaults.headers.common['Authorization'];
         user.value = null;
         isAuthenticated.value = false;
-
+        deleteCookie('access_token');
         // Redirect to login
-        router.visit('/login');
+        router.visit('/admin/login');
     }
 
     return {

@@ -369,12 +369,10 @@ onMounted(() => {
                     <div class="hidden lg:flex items-center gap-3">
                         <Button outlined class="border-white/30! text-white! hover:bg-white/10!" size="small">
                             <template #icon><font-awesome-icon :icon="faArrowsRotate" /></template>
-                            Refresh
                         </Button>
                         <Button class="bg-white! text-indigo-700! border-0! font-semibold hover:bg-white/90!"
                             size="small">
                             <template #icon><font-awesome-icon :icon="faPlus" /></template>
-                            Generate Report
                         </Button>
                     </div>
                 </div>
@@ -636,20 +634,17 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <Button text severity="secondary" size="small"
+                        <Button text severity="secondary" size="small" label="Filter"
                             class="hover:bg-surface-100 dark:hover:bg-surface-800">
                             <template #icon><font-awesome-icon :icon="faFilter" class="text-xs" /></template>
-                            Filter
                         </Button>
-                        <Button text severity="secondary" size="small"
+                        <Button text severity="secondary" size="small" label="Search"
                             class="hover:bg-surface-100 dark:hover:bg-surface-800">
                             <template #icon><font-awesome-icon :icon="faSearch" class="text-xs" /></template>
-                            Search
                         </Button>
-                        <Button size="small"
+                        <Button size="small" label="Add Deal"
                             class="bg-linear-to-r! from-indigo-500! to-indigo-600! border-0! shadow-md hover:shadow-lg text-white!">
                             <template #icon><font-awesome-icon :icon="faPlus" class="text-xs" /></template>
-                            Add Deal
                         </Button>
                     </div>
                 </div>

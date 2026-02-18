@@ -3,22 +3,23 @@ import AppDataTable from '@/Components/AppDataTable.vue';
 import AppModal from '@/Components/AppModal.vue';
 import UserForm from './Form.vue';
 import { admin } from '@/core';
-import { ref } from 'vue';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
 const toast = useToast();
 const tableRef = ref();
 
 const config = {
     title: "Users",
+    titleIcon: faUsers,
     dataApi: admin.USERS_FILTER_API,
     headers: [
         { field: "s_no", label: "S.No.", filter: false, sortable: false, class: "w-[5%]" },
         { field: "username", label: "Username" },
         { field: "email", label: "Email" },
-        { field: "roles", label: "Roles" },
-        { field: "is_active", label: "Status" }
+        { field: "roles", label: "Roles", searchable: false , sortable: false },
+        { field: "is_active", label: "Status", searchable: false , sortable: false }
     ],
     export: { columns: ["id", "email"] },
     actions: {

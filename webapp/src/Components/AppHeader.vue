@@ -1,48 +1,19 @@
 <script setup lang="ts">
 import AppBreadCrumb from "./AppBreadCrumb.vue";
 import Notification from "./Notification.vue";
+import HeaderUserMenu from "./HeaderUserMenu.vue";
 
-import { useUserStore } from "@/Store/userStore";
 import { useTheme } from "@/Composables/useTheme";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faBars, faSlidersH, faShareAlt, faEllipsisH,
-    faSun, faMoon, faUser, faCog, faSignOutAlt
+    faSun, faMoon
 } from "@fortawesome/free-solid-svg-icons";
 
 const emit = defineEmits(['toggle-sidebar']);
-const userStore = useUserStore();
 const { toggleTheme, isDark } = useTheme();
 
-const userMenu = ref();
 
-const userMenuItems = ref<any>([
-    {
-        label: 'Profile',
-        icon: faUser,
-        command: () => console.log('Profile')
-    },
-    {
-        label: 'Settings',
-        icon: faCog,
-        command: () => console.log('Settings')
-    },
-    {
-        separator: true
-    },
-    {
-        label: 'Logout',
-        icon: faSignOutAlt,
-        command: () => userStore.logout()
-    }
-]);
-
-
-
-
-function toggleUserMenu(event: Event) {
-    userMenu.value.toggle(event);
-}
 </script>
 
 <template>
@@ -54,8 +25,6 @@ function toggleUserMenu(event: Event) {
                 @click="emit('toggle-sidebar')">
                 <font-awesome-icon :icon="faBars" class="text-lg" />
             </Button>
-
-
 
             <AppBreadCrumb />
         </div>
@@ -93,21 +62,9 @@ function toggleUserMenu(event: Event) {
             </Button>
 
             <!-- User Menu -->
-            <div class="relative">
-                <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" shape="circle"
-                    class="cursor-pointer ring-2 ring-surface-200 dark:ring-surface-700 hover:ring-primary-500 transition-all"
-                    @click="toggleUserMenu" />
-            </div>
+            <HeaderUserMenu />
 
-            <Menu ref="userMenu" :model="userMenuItems" :popup="true">
-                <template #item="{ item }">
-                    <a
-                        class="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-800 rounded transition-colors">
-                        <font-awesome-icon v-if="item.icon" :icon="item.icon" class="text-surface-400" />
-                        <span>{{ item.label }}</span>
-                    </a>
-                </template>
-            </Menu>
+
         </div>
     </header>
 </template>

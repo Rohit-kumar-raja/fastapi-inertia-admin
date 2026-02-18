@@ -14,11 +14,10 @@ const config = {
     title: "Roles",
     dataApi: admin.ROLES_FILTER_API,
     headers: [
-        {field: "s_no", label: "S.NO", sortable: true},
-        { field: "name", label: "Name", sortable: true },
-        { field: "description", label: "Description", sortable: true },
-        { field: "created_at", label: "Created At", sortable: true },
-        { field: "updated_at", label: "Updated At", sortable: true }
+        { field: "s_no", label: "S.NO" },
+        { field: "name", label: "Name" },
+        { field: "created_at", label: "Created At", sortable: false, searchable: false },
+        { field: "updated_at", label: "Updated At", sortable: false, searchable: false }
     ],
     actions: {
         addRecord: { isEnabled: true },

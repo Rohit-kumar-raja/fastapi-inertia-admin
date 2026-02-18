@@ -74,5 +74,3 @@ const visible = defineModel<boolean>('visible');
         </template>
     </Dialog>
 </template>
-
-

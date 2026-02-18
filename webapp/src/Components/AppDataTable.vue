@@ -15,7 +15,7 @@
                     <div class="flex items-center gap-3">
                         <div
                             class="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
-                            <FontAwesomeIcon :icon="faTableList" />
+                            <FontAwesomeIcon :icon="normalizedConfig.titleIcon" />
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-surface-900 dark:text-surface-0 leading-tight"
@@ -174,6 +174,7 @@ const defaultConfig = {
         addRecord: { isEnabled: true },
     },
     title: "",
+    titleIcon: faTableList,
     dataApi: ""
 };
 
@@ -262,30 +263,59 @@ const filterData = async (event: Partial<FilterEventType | DataTableFilterEvent>
     loading.value = true;
     try {
         first.value = event.first ?? 0
-        payload.value = {
-            action: "filter",
-            draw: apiCall.value,
-            payload: {
-                offset: event.first ?? 0,
-                limit: event.rows ?? normalizedConfig.value.pagination.recordsPerPage,
-                sort: event.multiSortMeta ?? [],
-                filter: {
-                    global: { query: filters.value.global.value ?? "" },
-                    columns: normalizedConfig.value.headers
-                        .filter((col: HeaderColumn) => col.filter === true)
-                        .map((col: HeaderColumn) => ({
-                            field: col.field,
-                            filter: col.searchable ?? true,
-                            value: filters.value[col.field]?.value ?? "",
-                        })),
-                },
+        // Filter out s_no columns first, AND columns that are neither searchable nor sortable
+        const validHeaders = normalizedConfig.value.headers.filter((col: HeaderColumn) => {
+            if (['s_no', 'sno'].includes(col.field)) return false;
 
+            const isSearchable = col.searchable ?? true;
+            const isSortable = col.sortable ?? true;
 
-            },
+            if (!isSearchable && !isSortable) return false;
+
+            return true;
+        });
+
+        // Helper to find column index in the FILTERED list
+        const getColumnIndex = (field: string) => {
+            return validHeaders.findIndex((col: HeaderColumn) => col.field === field);
         };
-        if (props.extraFilter) {
-            (payload.value as any).payload.extra = props.extraFilter
-        }
+
+        // Construct Ordered Columns
+        const columns = validHeaders.map((col: HeaderColumn) => ({
+            data: col.field,
+            name: col.field,
+            searchable: col.searchable ?? true,
+            orderable: col.sortable ?? true,
+            search: {
+                value: filters.value[col.field]?.value ?? "",
+                regex: false
+            }
+        }));
+
+        // Construct Sort Order
+        const order = (event.multiSortMeta ?? []).reduce((acc: any[], sort: any) => {
+            const index = getColumnIndex(sort.field);
+            if (index !== -1) {
+                acc.push({
+                    column: index,
+                    dir: sort.order === 1 ? 'asc' : 'desc'
+                });
+            }
+            return acc;
+        }, []);
+
+        payload.value = {
+            draw: apiCall.value,
+            start: event.first ?? 0,
+            length: event.rows ?? normalizedConfig.value.pagination.recordsPerPage,
+            search: {
+                value: filters.value.global.value ?? "",
+                regex: false
+            },
+            order: order,
+            columns: columns,
+            extra: props.extraFilter ?? null
+        };
 
 
 
