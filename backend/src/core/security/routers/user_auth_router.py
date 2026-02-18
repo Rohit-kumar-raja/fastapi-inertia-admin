@@ -7,15 +7,19 @@ from ..services.user_service import UserService
 from ..utils.hash import verify_password
 from ..utils.auth import create_access_token
 from ..utils import error_response, response
-from .. import get_db
+from .. import get_db,InertiaDep
 
 auth_router = APIRouter(prefix="/login", tags=["auth"])
 
 
+@auth_router.get("", name="user.login")
+async def login(inertia: InertiaDep):
+    return await inertia.render("Login")
+
 @auth_router.post(
     "",
     response_model=LoginResponseSchema[UserLoginResponseSchema],
-    name="admin.user.login",
+    name="user.login",
     status_code=status.HTTP_200_OK,
 )
 async def login(
@@ -39,9 +43,11 @@ async def login(
     return response_data
 
 
+@auth_router.post("/reset-password", name="admin.user.reset-password")
 async def reset_password(self):
     pass
 
 
+@auth_router.post("/forgot-password", name="admin.user.forgot-password")
 async def forgot_password(self):
     pass

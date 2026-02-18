@@ -40,6 +40,7 @@ axios.interceptors.request.use(config => {
 
 createInertiaApp({
   resolve: async (name: string) => {
+    console.log(name)
     const pages = import.meta.glob('./Pages/**/*.vue')
     const page: any = await pages[`./Pages/${name}.vue`]?.()
     if (name.startsWith('Admin/')) {

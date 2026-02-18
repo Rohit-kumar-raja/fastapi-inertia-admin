@@ -26,10 +26,10 @@ export const useUserStore = defineStore('user', () => {
                 isAuthenticated.value = true;
 
                 // Redirect to dashboard
-                router.visit('/');
+                router.visit('/admin/dashboard');
             }
             return response;
-        } catch (error) {
+        } catch (error:any) {
             throw error;
         }
     }

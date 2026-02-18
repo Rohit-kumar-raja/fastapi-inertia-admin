@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import Button from 'primevue/button';
-import Menu from 'primevue/menu';
-import Avatar from 'primevue/avatar';
 import AppBreadCrumb from "./AppBreadCrumb.vue";
 import Notification from "./Notification.vue";
 
 import { useUserStore } from "@/Store/userStore";
+import { useTheme } from "@/Composables/useTheme";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faBars, faSlidersH, faShareAlt, faEllipsisH,
     faSun, faMoon, faUser, faCog, faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
 
-const isDark = ref(false);
 const emit = defineEmits(['toggle-sidebar']);
 const userStore = useUserStore();
+const { toggleTheme, isDark } = useTheme();
 
 const userMenu = ref();
 
@@ -40,21 +37,8 @@ const userMenuItems = ref<any>([
     }
 ]);
 
-onMounted(() => {
-    // Check if dark mode is already enabled
-    isDark.value = document.documentElement.classList.contains('dark');
-});
 
-function toggleTheme() {
-    isDark.value = !isDark.value;
-    if (isDark.value) {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-    }
-}
+
 
 function toggleUserMenu(event: Event) {
     userMenu.value.toggle(event);

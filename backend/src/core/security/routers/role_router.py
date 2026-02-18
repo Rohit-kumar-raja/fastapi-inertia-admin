@@ -7,7 +7,7 @@ from ..utils import error_response, response
 from .. import get_db,InertiaDep
 from datatables import DataTablesRequest
 
-role_router = APIRouter(prefix="/roles", tags=["roles"])
+role_router = APIRouter(prefix="/administration/roles", tags=["roles"])
 
 
 @role_router.get("", status_code=status.HTTP_200_OK, name="admin.role.read")

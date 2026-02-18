@@ -8,7 +8,7 @@ from .. import get_db,InertiaDep
 from datatables import DataTablesRequest
 
 
-user_router = APIRouter(prefix="/users", tags=["users"])
+user_router = APIRouter(prefix="/administration/users", tags=["users"])
 
 
 @user_router.get("", status_code=status.HTTP_200_OK, name="admin.user.read")

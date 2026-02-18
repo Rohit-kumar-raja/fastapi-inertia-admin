@@ -7,7 +7,7 @@ from ..services.route_service import RouteService
 from ..utils import error_response, response
 from .. import get_db
 
-routes_router = APIRouter(prefix="/routes", tags=["routes"])
+routes_router = APIRouter(prefix="/administration/routes", tags=["routes"])
 
 
 @routes_router.get("", status_code=status.HTTP_200_OK, name="admin.routes.read")

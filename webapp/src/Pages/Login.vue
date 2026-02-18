@@ -2,6 +2,7 @@
 import { useForm } from '@inertiajs/vue3';
 import { useUserStore } from '@/Store/userStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { useToast } from 'primevue';
 import { faBolt, faUser, faLock, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 defineOptions({
