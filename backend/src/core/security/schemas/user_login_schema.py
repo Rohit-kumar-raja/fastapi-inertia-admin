@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 from pydantic import BaseModel, Field
 from ...common.schemas import BaseSchema
@@ -30,5 +31,4 @@ class UserLoginResponseSchema(BaseModel):
     """
 
     user: UserDetailsResponseSchema
-    # created_at: datetime.datetime
-    # routes: list[RouteResponseSchema] = Field([], description="List of routes ids")
+    permissions: List[str] = Field(default=[], description="List of user permission names")

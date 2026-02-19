@@ -1,13 +1,13 @@
-from .user_model import UserModel,UserRoleLinkModel
-from .role_model import RoleModel,RolePermissionLinkModel
-from .route_model import RouteModel
+from .user_model import UserModel, UserRoleLinkModel
+from .role_model import RoleModel, RolePermissionLinkModel
+from .permission_model import PermissionModel
 
 
 
 __all__ = [
     "UserModel",
     "RoleModel",
-    "RouteModel",
+    "PermissionModel",
     "UserRoleLinkModel",
     "RolePermissionLinkModel",
 ]

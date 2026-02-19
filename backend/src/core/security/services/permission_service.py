@@ -1,25 +1,26 @@
-from typing import List, Optional
-from sqlalchemy.orm import selectinload, with_loader_criteria
+from typing import List, Optional, Dict
 from uuid import UUID
 from datetime import datetime
-from sqlalchemy import delete, select, update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..models.route_model import RouteModel
+from sqlalchemy.orm import selectinload
+
+from ..models.permission_model import PermissionModel
 
 
 class PermissionService:
     """
-    PermissionService handles the business logic and database operations for Permission.
+    PermissionService handles business logic for action-based permissions.
+    Supports auto-syncing permissions from FastAPI route names.
     """
 
     @staticmethod
-    async def create(data: dict, session: AsyncSession) -> RouteModel:
-        """Create a new Route."""
+    async def create(data: dict, session: AsyncSession) -> PermissionModel:
+        """Create a new Permission."""
         try:
-            instance = RouteModel(**data)
-
+            instance = PermissionModel(**data)
             session.add(instance)
-            await session.commit()  # Ensure instance.id is available
+            await session.commit()
             await session.refresh(instance)
             return instance
         except Exception as e:
@@ -27,68 +28,55 @@ class PermissionService:
             raise e
 
     @staticmethod
-    async def get_all(session: AsyncSession) -> List[RouteModel]:
-        """Fetch all active and non-deleted Route."""
-        statement = (
-            select(RouteModel)
-            .where(RouteModel.deleted_at.is_(None))
-        )
+    async def get_all(session: AsyncSession) -> List[PermissionModel]:
+        """Fetch all active and non-deleted Permissions."""
+        statement = select(PermissionModel).where(PermissionModel.deleted_at.is_(None))
         result = await session.execute(statement)
-        routes = result.scalars().unique().all()
-        return routes
+        return result.scalars().all()
 
     @staticmethod
-    async def get_by_id(uuid: UUID, session: AsyncSession) -> Optional[RouteModel]:
-        """Fetch a Route by its UUID."""
-        statement = (
-            select(RouteModel)
-            .where(
-                RouteModel.id == uuid,
-                RouteModel.deleted_at.is_(None),
-            )
-            .options(
-                selectinload(RouteModel.children).options(
-                    selectinload(RouteModel.children)  # This enables n-level deep loading
-                ),
-                with_loader_criteria(
-                    RouteModel,  # Applies to RouteModel's children
-                    RouteModel.deleted_at.is_(None),
-                    include_aliases=True,  # Necessary when dealing with relationships
-                ),
-            )
+    async def get_by_id(uuid: UUID, session: AsyncSession) -> Optional[PermissionModel]:
+        """Fetch a Permission by its UUID."""
+        statement = select(PermissionModel).where(
+            PermissionModel.id == uuid,
+            PermissionModel.deleted_at.is_(None),
         )
         result = await session.execute(statement)
         return result.scalars().first()
 
     @staticmethod
-    async def update(uuid: UUID, data: dict, session: AsyncSession) -> Optional[RouteModel]:
+    async def get_by_name(name: str, session: AsyncSession) -> Optional[PermissionModel]:
+        """Fetch a Permission by its name."""
+        statement = select(PermissionModel).where(
+            PermissionModel.name == name,
+            PermissionModel.deleted_at.is_(None),
+        )
+        result = await session.execute(statement)
+        return result.scalars().first()
+
+    @staticmethod
+    async def update(uuid: UUID, data: dict, session: AsyncSession) -> Optional[PermissionModel]:
         """Update an existing Permission."""
-        async with session.begin():
+        try:
             data.pop("id", None)
             await session.execute(
-                update(RouteModel)
+                update(PermissionModel)
                 .where(
-                    RouteModel.id == uuid,
-                    RouteModel.deleted_at.is_(None),
+                    PermissionModel.id == uuid,
+                    PermissionModel.deleted_at.is_(None),
                 )
                 .values(**data)
             )
+            await session.commit()
             return await PermissionService.get_by_id(uuid, session)
-
-        await session.execute(
-                update(RouteModel)
-                .where(
-                    RouteModel.id == uuid,
-                    RouteModel.deleted_at.is_(None),
-                )
-                .values(**data)
-            )
-        return await PermissionService.get_by_id(uuid, session)
+        except Exception:
+            await session.rollback()
+            return None
 
     @staticmethod
     async def delete(uuid: UUID, session: AsyncSession) -> bool:
         """Soft delete a Permission by its UUID."""
-        instance = await session.get(RouteModel, uuid)
+        instance = await session.get(PermissionModel, uuid)
         if instance and instance.deleted_at is None:
             instance.deleted_at = datetime.utcnow()
             await session.commit()
@@ -96,42 +84,84 @@ class PermissionService:
         return False
 
     @staticmethod
-    async def is_unique(name: str, parent_id: UUID, session: AsyncSession) -> bool:
-        """Check if a permission with the same name and parent_id exists."""
-        statement = select(RouteModel).where(
-            RouteModel.name == name,
-            RouteModel.parent_id == parent_id,
-            RouteModel.deleted_at.is_(None),
-        )
-        result = await session.execute(statement)
-        return result.scalars().first() is not None
-
-    @staticmethod
-    async def get_permission_tree(session: AsyncSession):
-        """Fetch all routes and structure them as a hierarchy."""
-        statement = (
-            select(RouteModel)
-            .where(RouteModel.deleted_at.is_(None))
-            .options(
-                selectinload(RouteModel.children),
-                with_loader_criteria(RouteModel, RouteModel.deleted_at.is_(None)),
-                selectinload(RouteModel.privileges),
-            )
-        )
-
-        result = await session.execute(statement)
-        routes = result.scalars().all()
-        # Filter the root-level permissions (those without a parent)
-        tree = [perm for perm in routes if perm.parent_id is None]
-
-        def serialize(perm):
-            return {
+    async def get_permissions_grouped(session: AsyncSession) -> List[Dict]:
+        """Fetch all permissions grouped by module."""
+        permissions = await PermissionService.get_all(session)
+        groups: Dict[str, List[dict]] = {}
+        for perm in permissions:
+            module = perm.module
+            if module not in groups:
+                groups[module] = []
+            groups[module].append({
                 "id": str(perm.id),
                 "name": perm.name,
-                "parent_id": str(perm.parent_id) if perm.parent_id else None,
+                "module": perm.module,
+                "description": perm.description,
                 "is_active": perm.is_active,
-                "created_at": perm.created_at.isoformat(),
-                "children": [serialize(child) for child in perm.children],  # Ensure correct child hierarchy
-            }
+            })
+        return [{"module": module, "permissions": perms} for module, perms in groups.items()]
 
-        return list(map(serialize, tree))
+    @staticmethod
+    def _extract_module(route_name: str) -> str:
+        """Extract module from route name. E.g. 'admin.role.read' -> 'role'."""
+        parts = route_name.split(".")
+        if len(parts) >= 2:
+            return parts[-2]
+        return parts[0]
+
+    @staticmethod
+    def _generate_description(route_name: str) -> str:
+        """Generate a human-readable description from route name."""
+        parts = route_name.split(".")
+        if len(parts) >= 2:
+            action = parts[-1].replace("-", " ").title()
+            module = parts[-2].replace("-", " ").title()
+            return f"{action} {module}"
+        return route_name.replace(".", " ").replace("-", " ").title()
+
+    @staticmethod
+    async def sync_permissions(app, session: AsyncSession) -> dict:
+        """
+        Scan all FastAPI routes and upsert permissions into the database.
+        Returns a summary of created, existing, and deactivated permissions.
+        """
+        from fastapi.routing import APIRoute
+
+        route_names = set()
+        for route in app.routes:
+            if isinstance(route, APIRoute) and route.name:
+                route_names.add(route.name)
+
+        # Get existing permissions
+        existing = await PermissionService.get_all(session)
+        existing_map = {p.name: p for p in existing}
+
+        created = 0
+        reactivated = 0
+
+        for name in route_names:
+            if name in existing_map:
+                # Re-activate if soft-deleted
+                perm = existing_map[name]
+                if not perm.is_active:
+                    perm.is_active = True
+                    reactivated += 1
+            else:
+                # Create new permission
+                perm = PermissionModel(
+                    name=name,
+                    module=PermissionService._extract_module(name),
+                    description=PermissionService._generate_description(name),
+                    is_active=True,
+                )
+                session.add(perm)
+                created += 1
+
+        await session.commit()
+
+        return {
+            "created": created,
+            "reactivated": reactivated,
+            "existing": len(existing_map),
+            "total_routes": len(route_names),
+        }

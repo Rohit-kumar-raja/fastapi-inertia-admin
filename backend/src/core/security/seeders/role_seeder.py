@@ -1,4 +1,4 @@
-from ..services.route_service import RouteService
+from ..services.permission_service import PermissionService
 from ..services.role_service import RoleService
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
@@ -18,19 +18,19 @@ class RoleSeeder:
         """
         records = [
             {
-                "name": "Role1",
+                "name": "Admin",
             },
             {
-                "name": "Role2",
+                "name": "Editor",
             },
         ]
 
         # Insert the data into the database using a loop
         for record in records:
-            routes_services = await RouteService.get_all(session=session)
-            if not routes_services:
-                raise ValueError("No routes found in the database.")
-            record["route_ids"] = [route.id for route in routes_services]
+            permissions = await PermissionService.get_all(session=session)
+            if not permissions:
+                raise ValueError("No permissions found in the database. Run PermissionSeeder first.")
+            record["permission_ids"] = [perm.id for perm in permissions]
             await RoleService.create(record, session=session)
 
     @staticmethod

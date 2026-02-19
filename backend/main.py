@@ -57,3 +57,17 @@ app.mount(
 
 app.include_router(admin_router)
 app.include_router(security_router)
+
+
+@app.on_event("startup")
+async def startup_sync_permissions():
+    """Auto-sync permissions from all registered FastAPI routes on server start."""
+    from src.core.security.services.permission_service import PermissionService
+    from src.core.config.database import AsyncSessionLocal
+
+    async with AsyncSessionLocal() as session:
+        try:
+            result = await PermissionService.sync_permissions(app, session=session)
+            print(f"✅ Permissions auto-synced: created={result['created']}, total_routes={result['total_routes']}")
+        except Exception as e:
+            print(f"⚠️ Permission sync failed (non-fatal): {e}")

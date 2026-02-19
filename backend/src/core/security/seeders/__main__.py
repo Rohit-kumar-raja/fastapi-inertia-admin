@@ -1,11 +1,11 @@
 import asyncio
 
+from .route_seeder import PermissionSeeder
 from .role_seeder import RoleSeeder
-from .route_seeder import RouteSeeder
 from .user_seeder import UserSeeder
 from core.config.database import AsyncSessionLocal
 
-seeders = [RouteSeeder, RoleSeeder, UserSeeder]
+seeders = [PermissionSeeder, RoleSeeder, UserSeeder]
 
 
 async def run_seeders():

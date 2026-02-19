@@ -3,14 +3,19 @@ import { ref } from 'vue';
 import { admin, deleteCookie } from '@/core';
 import axios from 'axios';
 import { router } from '@inertiajs/vue3';
+import { usePermission } from '@/Composables/usePermission';
 
 export const useUserStore = defineStore('user', () => {
     const user = ref<any>(null);
     const isAuthenticated = ref(!!localStorage.getItem('access_token'));
+    const { loadPermissions, clearPermissions, initPermissions } = usePermission();
+
+    // Initialize permissions from localStorage on store creation
+    initPermissions();
 
     function setUser(userData: any) {
         user.value = userData;
-        isAuthenticated.value = true;
+        isAuthenticated.value = true; 
     }
 
     async function login(credentials: any) {
@@ -24,6 +29,10 @@ export const useUserStore = defineStore('user', () => {
                 localStorage.setItem('access_token', token);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 isAuthenticated.value = true;
+
+                // Load permissions from login response
+                const permissions = response.data.data?.permissions || response.data.permissions || [];
+                loadPermissions(permissions);
 
                 // Redirect to dashboard
                 router.visit('/admin/dashboard');
@@ -39,6 +48,7 @@ export const useUserStore = defineStore('user', () => {
         delete axios.defaults.headers.common['Authorization'];
         user.value = null;
         isAuthenticated.value = false;
+        clearPermissions();
         deleteCookie('access_token');
         // Redirect to login
         router.visit('/admin/login');

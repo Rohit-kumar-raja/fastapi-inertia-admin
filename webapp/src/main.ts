@@ -9,6 +9,7 @@ import Aura from '@primevue/themes/aura';
 import { definePreset } from '@primevue/themes';
 import ToastService from 'primevue/toastservice'
 import axios from 'axios'
+import { vPermission } from './Composables/vPermission'
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -62,6 +63,7 @@ createInertiaApp({
           }
         }
       })
+      .directive('permission', vPermission)
       .mount(el)
   }
 })

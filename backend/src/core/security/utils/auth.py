@@ -37,7 +37,7 @@ def reset_request_context(token):
 def create_access_token(user: UserModel, additional_info: dict = {}) -> str:
     if not user:
         return None
-    to_encode = {"id": str(user.id), "sub": user.username}
+    to_encode = {"id": str(user.id), "sub": user.username, "is_superuser": user.is_superuser}
     if ACCESS_TOKEN_EXPIRE_MINUTES is not None:
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode.update({"exp": expire})

@@ -41,35 +41,26 @@ def docs(ctx: typer.Context):
     subprocess.run(["mkdocs"] + ctx.args)
 
 
-async def url_generator():
-    from main import app
-    from apps.admin.services.backend_url_service import BackendUrlService
+async def permission_sync():
+    from main import app as fastapi_app
+    from core.security.services.permission_service import PermissionService
     from core.config.database import AsyncSessionLocal
 
     async with AsyncSessionLocal() as session:
-        for route in app.routes:
-            if isinstance(route, APIRoute):
-                name = route.name
-                path: str = route.path
-                methods = list(route.methods)[0]
-                data = {
-                    "name": name,
-                    "path": path.replace("{uuid}", ""),
-                    "method": methods,
-                    "description": "Auto-generated URL",
-                    "is_active": True,
-                }
-                await BackendUrlService.create(
-                    data=data,
-                    session=session,
-                )
+        result = await PermissionService.sync_permissions(fastapi_app, session=session)
+        print(f"\n✅ Permission sync complete:")
+        print(f"   Created: {result['created']}")
+        print(f"   Reactivated: {result['reactivated']}")
+        print(f"   Existing: {result['existing']}")
+        print(f"   Total routes scanned: {result['total_routes']}")
 
 
 @app.command()
-def generateurl():
+def syncpermissions():
+    """Scan all FastAPI routes and sync into the auth_permission table."""
     import asyncio
 
-    asyncio.run(url_generator())
+    asyncio.run(permission_sync())
 
 
 @app.command()

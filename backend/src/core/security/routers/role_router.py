@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..schemas.role_schema import RoleSchema
 from ..services.role_service import RoleService
 from ..utils import error_response, response
-from .. import get_db,InertiaDep
+from .. import get_db, InertiaDep
+from ...dependencies.permission_dependency import require_permission
 from datatables import DataTablesRequest
 
 role_router = APIRouter(prefix="/administration/roles", tags=["roles"])
@@ -16,8 +17,13 @@ async def index(inertia: InertiaDep):
     return await inertia.render("Admin/Roles/Index")
 
 
-@role_router.post("", status_code=status.HTTP_201_CREATED, name="admin.role.write")
-async def create(role: RoleSchema, session: AsyncSession = Depends(get_db), satatus_code=status.HTTP_201_CREATED):
+@role_router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    name="admin.role.write",
+    dependencies=[Depends(require_permission("admin.role.write"))],
+)
+async def create(role: RoleSchema, session: AsyncSession = Depends(get_db)):
     """Create new data based on the request."""
     is_unique = await RoleService.is_unique(name=role.name, session=session)
     if is_unique:
@@ -27,7 +33,7 @@ async def create(role: RoleSchema, session: AsyncSession = Depends(get_db), sata
     return response(data=response_data, message="Data created successfully")
 
 
-@role_router.get("/{uuid}", status_code=status.HTTP_200_OK, name="admin.role.read")
+@role_router.get("/{uuid}", status_code=status.HTTP_200_OK, name="admin.role.detail")
 async def edit(uuid: UUID, session: AsyncSession = Depends(get_db)):
     """Read or edit the data based on the given UUID."""
     data = await RoleService().get_by_id(uuid, session)
@@ -36,14 +42,24 @@ async def edit(uuid: UUID, session: AsyncSession = Depends(get_db)):
     return response(data=data, message="Data fetched successfully")
 
 
-@role_router.put("/{uuid}", status_code=status.HTTP_200_OK, name="admin.role.edit")
+@role_router.put(
+    "/{uuid}",
+    status_code=status.HTTP_200_OK,
+    name="admin.role.edit",
+    dependencies=[Depends(require_permission("admin.role.edit"))],
+)
 async def update(role: RoleSchema, uuid: UUID, session: AsyncSession = Depends(get_db)):
     """Update the data based on the given UUID."""
     data = await RoleService().update(uuid, role.model_dump(), session)
     return response(data=data, message="Data updated successfully")
 
 
-@role_router.delete("/{uuid}", status_code=status.HTTP_200_OK, name="admin.role.delete")
+@role_router.delete(
+    "/{uuid}",
+    status_code=status.HTTP_200_OK,
+    name="admin.role.delete",
+    dependencies=[Depends(require_permission("admin.role.delete"))],
+)
 async def destroy(uuid: UUID, session: AsyncSession = Depends(get_db)):
     """Delete the data based on the given UUID."""
     data = await RoleService().delete(uuid, session)

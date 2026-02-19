@@ -1,44 +1,35 @@
-from ..models.route_model import RouteModel,RolePermissionLinkModel
-from ..services.route_service import RouteService
+from ..models.permission_model import PermissionModel
+from ..models.role_model import RolePermissionLinkModel
+from ..services.permission_service import PermissionService
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import delete
 
 
-class RouteSeeder:
+class PermissionSeeder:
     """
-    Seeder for RouteModel to populate initial data.
+    Seeder for PermissionModel.
+    Auto-syncs permissions from FastAPI route names on startup.
     """
 
     @staticmethod
     async def run(session: AsyncSession):
         """
-        Run the seeder to insert sample data into the database.
+        Sync all permissions from the FastAPI app routes.
         """
-        records = [
-            {
-                "name": "Scada",
-            },
-            {
-                "name": "Admin",
-            },
-            {
-                "name": "Vision",
-            },
-        ]
+        from main import app
 
-        # Insert the data into the database using a loop
-        for record in records:
-            await RouteService.create(record, session=session)
+        result = await PermissionService.sync_permissions(app, session=session)
+        print(f"✅ Permissions synced: {result}")
 
     @staticmethod
     async def delete_all(session: AsyncSession):
         """
-        Delete all routes from the database.
+        Delete all permissions from the database.
         """
         try:
             await session.execute(delete(RolePermissionLinkModel))
-            await session.execute(delete(RouteModel))
+            await session.execute(delete(PermissionModel))
             await session.commit()
         except SQLAlchemyError as e:
             await session.rollback()

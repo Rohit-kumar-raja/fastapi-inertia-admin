@@ -7,9 +7,8 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models.route_model import RouteModel,RolePermissionLinkModel
-
-from ..models.role_model import RoleModel
+from ..models.permission_model import PermissionModel
+from ..models.role_model import RoleModel, RolePermissionLinkModel
 from datatables import DataTables, DataTablesRequest, DataTablesResponse
 
 
@@ -22,12 +21,12 @@ class RoleService:
     async def create(data: dict, session: AsyncSession) -> Optional[RoleModel]:
         """Create a new Role."""
         try:
-            route_ids = data.pop("route_ids", [])
-            routes = await session.execute(select(RouteModel).where(RouteModel.id.in_(route_ids)))
-            routes = routes.unique().scalars().all()
+            permission_ids = data.pop("permission_ids", [])
+            permissions = await session.execute(select(PermissionModel).where(PermissionModel.id.in_(permission_ids)))
+            permissions = permissions.unique().scalars().all()
             instance = RoleModel(**data)
 
-            instance.routes = routes
+            instance.permissions = permissions
             session.add(instance)
             await session.commit()
             await session.refresh(instance)
@@ -39,7 +38,11 @@ class RoleService:
     @staticmethod
     async def get_all(session: AsyncSession) -> List[dict]:
         """Fetch all Roles."""
-        statement = select(RoleModel).where(RoleModel.deleted_at.is_(None)).options(selectinload(RoleModel.routes))
+        statement = (
+            select(RoleModel)
+            .where(RoleModel.deleted_at.is_(None))
+            .options(selectinload(RoleModel.permissions))
+        )
         result = await session.execute(statement)
         return result.scalars().all()
 
@@ -52,7 +55,7 @@ class RoleService:
                 RoleModel.id == uuid,
                 RoleModel.deleted_at.is_(None),
             )
-            .options(selectinload(RoleModel.routes))
+            .options(selectinload(RoleModel.permissions))
         )
         result = await session.execute(statement)
         return result.scalars().first()
@@ -63,13 +66,13 @@ class RoleService:
         try:
             async with session.begin():
                 data.pop("id", None)
-                if "route_ids" in data:
-                    route_ids = data.pop("route_ids")
+                if "permission_ids" in data:
+                    permission_ids = data.pop("permission_ids")
                     await session.execute(
                         delete(RolePermissionLinkModel).where(RolePermissionLinkModel.auth_role_id == uuid)
                     )
-                    for route_id in route_ids:
-                        session.add(RolePermissionLinkModel(auth_route_id=route_id, auth_role_id=uuid))
+                    for permission_id in permission_ids:
+                        session.add(RolePermissionLinkModel(auth_permission_id=permission_id, auth_role_id=uuid))
                 await session.execute(
                     update(RoleModel).where(RoleModel.id == uuid, RoleModel.deleted_at.is_(None)).values(**data)
                 )
@@ -100,23 +103,12 @@ class RoleService:
         return result.scalars().first() is not None
 
     @staticmethod
-    async def create_role_and_permission(
-        role_id: UUID, permission_ids: List[UUID], session: AsyncSession
-    ) -> Optional[RolePermissionLinkModel]:
-        """Link a role with routes."""
-        try:
-            async with session.begin():
-                instance = RolePermissionLinkModel(auth_route_id=permission_ids[0], auth_role_id=role_id)
-                session.add(instance)
-            await session.commit()
-            return instance
-        except SQLAlchemyError:
-            await session.rollback()
-            return None
-
-    @staticmethod
     async def datatables(session: AsyncSession, request_data: DataTablesRequest) -> List[RoleModel]:
-        """Fetch all active and non-deleted Plc_connections."""
-        statement = select(RoleModel).filter_by(deleted_at=None, is_active=True).options(selectinload(RoleModel.routes))
+        """Fetch all active and non-deleted Roles."""
+        statement = (
+            select(RoleModel)
+            .filter_by(deleted_at=None, is_active=True)
+            .options(selectinload(RoleModel.permissions))
+        )
         datatables = DataTables(session, RoleModel, statement)
         return await datatables.process(request_data=request_data)

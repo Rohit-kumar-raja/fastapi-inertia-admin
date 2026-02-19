@@ -1,22 +1,51 @@
-from typing import List, Optional
+import time
+from typing import Dict, List, Optional, Set
 from sqlalchemy import delete, select, update
 from uuid import UUID
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 
-from ..models.route_model import RouteModel
-from ..models.role_model import RoleModel
-from ..models.user_model import UserModel,UserRoleLinkModel
+from ..models.permission_model import PermissionModel
+from ..models.role_model import RoleModel, RolePermissionLinkModel
+from ..models.user_model import UserModel, UserRoleLinkModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils.hash import make_password
 from datatables import DataTables, DataTablesRequest
+
+
+# In-memory permission cache: user_id -> (permissions_set, timestamp)
+_permission_cache: Dict[str, tuple[Set[str], float]] = {}
+_CACHE_TTL_SECONDS = 300  # 5 minutes
+
+
+def _get_cached_permissions(user_id: str) -> Optional[Set[str]]:
+    """Get cached permissions for a user, or None if expired/missing."""
+    if user_id in _permission_cache:
+        perms, ts = _permission_cache[user_id]
+        if time.time() - ts < _CACHE_TTL_SECONDS:
+            return perms
+        del _permission_cache[user_id]
+    return None
+
+
+def _set_cached_permissions(user_id: str, perms: Set[str]):
+    """Cache permissions for a user."""
+    _permission_cache[user_id] = (perms, time.time())
+
+
+def invalidate_permission_cache(user_id: Optional[str] = None):
+    """Invalidate permission cache. If user_id is None, invalidate all."""
+    if user_id is None:
+        _permission_cache.clear()
+    elif user_id in _permission_cache:
+        del _permission_cache[user_id]
 
 
 class UserService:
     """
     UserService handles the business logic and database operations for User.
     """
-    
+
     @staticmethod
     async def create(data: dict, session: AsyncSession) -> Optional[UserModel]:
         """Create a new User."""
@@ -66,6 +95,8 @@ class UserService:
                 await session.execute(
                     update(UserModel).where(UserModel.id == uuid, UserModel.deleted_at.is_(None)).values(**data)
                 )
+            # Invalidate permission cache for this user
+            invalidate_permission_cache(str(uuid))
             return await UserService.get_by_id(uuid, session)
         except Exception:
             await session.rollback()
@@ -79,6 +110,7 @@ class UserService:
             instance.deleted_at = datetime.utcnow()
             await session.commit()
             await session.refresh(instance)
+            invalidate_permission_cache(str(uuid))
             return True
         return False
 
@@ -90,13 +122,13 @@ class UserService:
             result = await session.execute(statement)
             if result.scalars().first() is not None:
                 return True
-        
+
         if email:
             statement = select(UserModel).where(UserModel.email == email, UserModel.deleted_at.is_(None))
             result = await session.execute(statement)
             if result.scalars().first() is not None:
                 return True
-        
+
         return False
 
     @staticmethod
@@ -110,25 +142,38 @@ class UserService:
         pass
 
     @staticmethod
-    async def get_role_routes(user_id: UUID, session: AsyncSession) -> List[str]:
-        """Fetch all routes for a User's roles."""
+    async def get_user_permissions(user_id: UUID, session: AsyncSession) -> List[str]:
+        """
+        Fetch all permission names for a user through their roles.
+        Uses in-memory caching for performance.
+        """
+        user_id_str = str(user_id)
+        cached = _get_cached_permissions(user_id_str)
+        if cached is not None:
+            return list(cached)
+
         statement = (
-            select(RouteModel)
-            .join(RoleModel.routes)
-            .join(UserRoleLinkModel)
-            .where(UserRoleLinkModel.auth_user_id == user_id)
-            .where(UserRoleLinkModel.auth_role_id == RoleModel.id)
-            .where(RoleModel.deleted_at.is_(None))
-            .options(selectinload(RouteModel.privileges))
+            select(PermissionModel.name)
+            .join(RolePermissionLinkModel, RolePermissionLinkModel.auth_permission_id == PermissionModel.id)
+            .join(RoleModel, RoleModel.id == RolePermissionLinkModel.auth_role_id)
+            .join(UserRoleLinkModel, UserRoleLinkModel.auth_role_id == RoleModel.id)
+            .where(
+                UserRoleLinkModel.auth_user_id == user_id,
+                RoleModel.deleted_at.is_(None),
+                PermissionModel.deleted_at.is_(None),
+                PermissionModel.is_active.is_(True),
+            )
+            .distinct()
         )
 
         result = await session.execute(statement)
-        return result.scalars().unique().all()
-        # return [permission for role in result.scalars().all() for permission in role]
+        permissions = set(result.scalars().all())
+        _set_cached_permissions(user_id_str, permissions)
+        return list(permissions)
 
     @staticmethod
     async def datatables(session: AsyncSession, request_data: DataTablesRequest) -> List[UserModel]:
-        """Fetch all active and non-deleted Plc_connections."""
+        """Fetch all active and non-deleted Users."""
         statement = select(UserModel).filter_by(deleted_at=None, is_active=True).options(selectinload(UserModel.roles))
         datatables = DataTables(session, UserModel, statement)
         return await datatables.process(request_data=request_data)
