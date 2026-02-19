@@ -40,12 +40,6 @@ const getStatusSeverity = (status: string) => {
 };
 
 onMounted(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-        window.location.href = '/login';
-        return;
-    }
-
     // ─── Line Chart (Revenue Trend) ───
     lineChartData.value = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
