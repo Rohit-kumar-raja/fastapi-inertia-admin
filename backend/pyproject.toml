@@ -20,6 +20,8 @@ dependencies = [
     "bcrypt>=5.0.0",
     "python-multipart>=0.0.20",
     "alembic>=1.17.2",
+    "pywebpush>=2.0.0",
+    "cryptography>=42.0.0",
 ]
 
 

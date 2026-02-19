@@ -98,6 +98,13 @@ def dropall():
 
 
 @app.command()
+def generate_vapid_keys():
+    """Generate VAPID key pair for Web Push notifications."""
+    from core.security.utils.vapid_keys import generate_vapid_keys as gen
+    gen()
+
+
+@app.command()
 def dbfresh():
     import typer
     import sys

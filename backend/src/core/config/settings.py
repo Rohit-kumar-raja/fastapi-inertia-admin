@@ -51,6 +51,10 @@ class Settings(BaseSettings):
     PGADMIN_SERVER_PORT: int = Field(..., description="PGAdmin server port")
     PGADMIN_CONTAINER: str = Field(..., description="PGAdmin container")
 
+    # ---------------- VAPID WEB PUSH ----------------
+    VAPID_PUBLIC_KEY: str = Field(default="", description="VAPID public key for Web Push")
+    VAPID_PRIVATE_KEY: str = Field(default="", description="VAPID private key for Web Push")
+    VAPID_CLAIMS_EMAIL: str = Field(default="mailto:admin@example.com", description="VAPID contact email")
 
 
     model_config = {

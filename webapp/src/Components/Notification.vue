@@ -9,6 +9,7 @@ import Button from 'primevue/button';
 import Popover from 'primevue/popover';
 import axios from 'axios';
 import { admin } from '@/core';
+import { useNotificationPush } from '@/Composables/useNotificationPush';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Notification {
@@ -20,13 +21,18 @@ interface Notification {
     created_at: string;
 }
 
+// ─── Push Notifications (Service Worker) ─────────────────────────────────────
+const {
+    init: initPush, requestPermission, showNotification: pushNotify,
+    pushPermission, isSubscribed, unsubscribeFromPush
+} = useNotificationPush();
+
 // ─── State ───────────────────────────────────────────────────────────────────
 const notificationPanel = ref();
 const notifications = ref<Notification[]>([]);
 const unreadCount = ref(0);
 const loading = ref(false);
 let pollInterval: ReturnType<typeof setInterval> | null = null;
-let pushPermission = ref<NotificationPermission>('default');
 
 // ─── Type Config ─────────────────────────────────────────────────────────────
 const typeConfig = {
@@ -97,10 +103,18 @@ async function fetchNotifications() {
         const newUnread = notifications.value.filter(n => !n.is_read).length;
         unreadCount.value = newUnread;
 
-        // Browser push for new notifications
+        // Service Worker push for new notifications
         if (newUnread > oldCount && oldCount > 0) {
             const newest = notifications.value.find(n => !n.is_read);
-            if (newest) sendBrowserPush(newest);
+            if (newest) {
+                pushNotify({
+                    title: newest.title,
+                    body: newest.message,
+                    type: newest.type,
+                    url: '/admin/dashboard',
+                    tag: newest.id,
+                });
+            }
         }
     } catch (e) {
         console.error('Failed to fetch notifications:', e);
@@ -162,28 +176,7 @@ async function deleteNotification(id: string, event: Event) {
     }
 }
 
-// ─── Browser Push Notifications ──────────────────────────────────────────────
-async function requestPushPermission() {
-    if (!('Notification' in window)) return;
-    pushPermission.value = Notification.permission;
-    if (Notification.permission === 'default') {
-        const result = await Notification.requestPermission();
-        pushPermission.value = result;
-    }
-}
-
-function sendBrowserPush(notification: Notification) {
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    const typeLabels: Record<string, string> = {
-        info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌'
-    };
-    new window.Notification(notification.title, {
-        body: notification.message || undefined,
-        icon: '/favicon.ico',
-        tag: notification.id,
-        badge: typeLabels[notification.type] || 'ℹ️',
-    });
-}
+// Push permission is managed by useNotificationPush composable
 
 // ─── Toggle ──────────────────────────────────────────────────────────────────
 function toggleNotifications(event: Event) {
@@ -192,9 +185,13 @@ function toggleNotifications(event: Event) {
 }
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
-onMounted(() => {
+onMounted(async () => {
+    await initPush();
     fetchNotifications();
-    requestPushPermission();
+    // Request permission after a short delay to avoid blocking
+    setTimeout(() => {
+        if (pushPermission.value === 'default') requestPermission();
+    }, 3000);
     // Poll for new notifications every 30s
     pollInterval = setInterval(fetchUnreadCount, 30000);
 });
@@ -395,13 +392,25 @@ onUnmounted(() => {
 
                 <!-- Push Permission Banner -->
                 <div v-if="pushPermission === 'default'"
-                    class="px-4 py-2.5 border-t border-surface-200 dark:border-surface-800 bg-gradient-to-r from-primary-50 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-800/10">
+                    class="px-4 py-2.5 border-t border-surface-200 dark:border-surface-800 bg-linear-to-r from-primary-50 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-800/10">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs text-primary-700 dark:text-primary-300">Enable browser notifications?</p>
-                        <Button @click="requestPushPermission" size="small" severity="secondary"
+                        <p class="text-xs text-primary-700 dark:text-primary-300">🔔 Enable push notifications?</p>
+                        <Button @click="requestPermission" size="small" severity="secondary"
                             class="text-xs px-2.5 py-1 rounded-lg">
                             Enable
                         </Button>
+                    </div>
+                </div>
+
+                <!-- Subscribed Status -->
+                <div v-else-if="pushPermission === 'granted' && isSubscribed"
+                    class="px-4 py-2 border-t border-surface-200 dark:border-surface-800">
+                    <div class="flex items-center justify-between">
+                        <p class="text-[11px] text-emerald-600 dark:text-emerald-400">✅ Push notifications active</p>
+                        <button @click="unsubscribeFromPush"
+                            class="text-[11px] text-surface-400 hover:text-red-500 transition-colors">
+                            Disable
+                        </button>
                     </div>
                 </div>
             </div>
