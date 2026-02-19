@@ -1,32 +1,11 @@
-<template>
-    <div class="relative">
-        <button @click="toggleUserMenu" class="user-avatar-btn" aria-label="User menu">
-            <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" alt="User"
-                class="user-avatar-img" />
-            <span class="user-status-dot"></span>
-        </button>
-    </div>
-    <Menu ref="userMenu" :model="userMenuItems" :popup="true">
-        <template #start>
-            <div class="user-menu-info">
-                <p class="user-menu-name">Amy Elsner</p>
-                <p class="user-menu-email">amy@example.com</p>
-            </div>
-        </template>
-        <template #item="{ item }">
-            <a class="user-menu-item" :class="{ 'user-menu-item--danger': item.label === 'Logout' }">
-                <font-awesome-icon v-if="item.icon" :icon="item.icon" class="text-xs" />
-                <span>{{ item.label }}</span>
-            </a>
-        </template>
-    </Menu>
-</template>
-
 <script setup lang="ts">
+import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUser, faCog, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useUserStore } from '@/Store/userStore';
-const userStore = useUserStore()
+import Menu from 'primevue/menu';
+
+const userStore = useUserStore();
 const userMenu = ref();
 
 const userMenuItems = ref<Array<Record<string, any>>>([
@@ -55,131 +34,37 @@ function toggleUserMenu(event: Event) {
 }
 </script>
 
-<style scoped>
-.user-avatar-btn {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-    outline: none;
-}
+<template>
+    <div class="relative">
+        <button @click="toggleUserMenu"
+            class="group relative flex items-center justify-center p-[2px] rounded-full transition-transform duration-200 hover:scale-105 outline-none focus:ring-2 focus:ring-primary-500/50"
+            aria-label="User menu">
+            <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" alt="User"
+                class="w-8 h-8 rounded-full object-cover border-2 border-slate-200 dark:border-white/10 group-hover:border-indigo-400 transition-colors duration-200" />
+            <span
+                class="absolute bottom-px right-px w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-surface-900"></span>
+        </button>
+    </div>
 
-.user-avatar-btn:hover {
-    transform: scale(1.05);
-}
-
-.user-avatar-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e2e8f0;
-    transition: border-color 0.2s ease;
-}
-
-:root.p-dark .user-avatar-img {
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
-.user-avatar-btn:hover .user-avatar-img {
-    border-color: #818cf8;
-}
-
-.user-status-dot {
-    position: absolute;
-    bottom: 1px;
-    right: 1px;
-    width: 8px;
-    height: 8px;
-    background: #22c55e;
-    border-radius: 50%;
-    border: 2px solid white;
-}
-
-:root.p-dark .user-status-dot {
-    border-color: #0a0f1e;
-}
-
-/* ─── Menu Info ────────────────────────────────────────────────────────────── */
-.user-menu-info {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-:root.p-dark .user-menu-info {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
-}
-
-.user-menu-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e293b;
-}
-
-:root.p-dark .user-menu-name {
-    color: #f1f5f9;
-}
-
-.user-menu-email {
-    font-size: 12px;
-    color: #94a3b8;
-    margin-top: 2px;
-}
-
-:root.p-dark .user-menu-email {
-    color: #64748b;
-}
-
-/* ─── Menu Items ───────────────────────────────────────────────────────────── */
-.user-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 14px;
-    cursor: pointer;
-    border-radius: 8px;
-    color: #475569;
-    font-size: 13px;
-    transition: all 0.15s ease;
-    margin: 2px 6px;
-}
-
-.user-menu-item:hover {
-    background: #f8fafc;
-    color: #1e293b;
-}
-
-:root.p-dark .user-menu-item {
-    color: #94a3b8;
-}
-
-:root.p-dark .user-menu-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: #f1f5f9;
-}
-
-/* Logout */
-.user-menu-item--danger {
-    color: #ef4444;
-}
-
-.user-menu-item--danger:hover {
-    background: rgba(239, 68, 68, 0.06);
-    color: #dc2626;
-}
-
-:root.p-dark .user-menu-item--danger {
-    color: #f87171;
-}
-
-:root.p-dark .user-menu-item--danger:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #fca5a5;
-}
-</style>
+    <Menu ref="userMenu" :model="userMenuItems" :popup="true"
+        class="border-0! shadow-xl! rounded-2xl! p-0! overflow-hidden bg-white dark:bg-slate-900 border-slate-100 dark:border-white/5 w-[200px]">
+        <template #start>
+            <div class="px-4 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5">
+                <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Amy Elsner</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">amy@example.com</p>
+            </div>
+        </template>
+        <template #item="{ item }">
+            <a v-if="!item.separator"
+                class="flex items-center gap-2.5 px-3.5 py-2 mx-1 my-0.5 rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer"
+                :class="[
+                    item.label === 'Logout'
+                        ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-100'
+                ]">
+                <font-awesome-icon v-if="item.icon" :icon="item.icon" class="text-xs opacity-70" />
+                <span>{{ item.label }}</span>
+            </a>
+        </template>
+    </Menu>
+</template>
