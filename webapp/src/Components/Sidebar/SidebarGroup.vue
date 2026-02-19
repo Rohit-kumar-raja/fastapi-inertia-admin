@@ -30,9 +30,9 @@ function isChildActive(route?: string) {
             isCollapsed ? 'lg:hidden lg:group-hover:grid' : 'block'
         ]">
             <div class="overflow-hidden">
-                <ul class="flex flex-col relative pl-6">
+                <ul class="flex flex-col relative pl-6 pt-1">
                     <!-- Vertical Guide Line -->
-                    <div class="absolute left-6 top-0 bottom-4 w-px bg-slate-200 dark:bg-white/10"></div>
+                    <div class="absolute left-6 top-0 bottom-4 w-px bg-slate-200 dark:bg-slate-700"></div>
 
                     <li v-for="(subItem, subIndex) in item.items" :key="subIndex"
                         class="relative flex items-center ml-4 px-4 rounded-lg text-sm transition-all duration-200 hover:translate-x-0.5"
@@ -43,7 +43,7 @@ function isChildActive(route?: string) {
                         ]">
 
                         <!-- Horizontal connector line -->
-                        <div class="absolute left-0 top-1/2 w-4 h-px bg-slate-200 dark:bg-white/10 -translate-y-1/2">
+                        <div class="absolute left-0 top-1/2 w-4 h-px bg-slate-200 dark:bg-slate-700 -translate-y-1/2">
                         </div>
 
                         <Link :href="subItem.route || '#'" class="py-2 flex-1 block">
