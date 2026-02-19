@@ -3,6 +3,7 @@ export const admin = {
     USERS_FILTER_API: `/admin/administration/users/filter`,
     LOGIN_API: `/admin/login`,
     ROLES_API: `/admin/administration/roles`,
+    ROLES_LIST_API: `/admin/administration/roles/list`,
     ROLES_FILTER_API: `/admin/administration/roles/filter`,
     PERMISSIONS_API: `/admin/administration/permissions`,
     PERMISSIONS_FLAT_API: `/admin/administration/permissions/flat`,

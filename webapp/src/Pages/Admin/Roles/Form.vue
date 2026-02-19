@@ -275,9 +275,9 @@ onMounted(() => {
                     </div>
                     <div class="flex items-center gap-1">
                         <Button label="All" size="small" text severity="info" @click="selectAll"
-                            icon="pi pi-check-square" class="!text-xs" />
+                            icon="pi pi-check-square" class="text-xs!" />
                         <Button label="None" size="small" text severity="secondary" @click="deselectAll"
-                            icon="pi pi-stop" class="!text-xs" />
+                            icon="pi pi-stop" class="text-xs!" />
                     </div>
                 </div>
 
@@ -286,7 +286,7 @@ onMounted(() => {
                     <i
                         class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 text-sm pointer-events-none"></i>
                     <InputText v-model="searchQuery" placeholder="Search permissions..."
-                        class="w-full !pl-9 !text-sm" />
+                        class="w-full pl-9! text-sm!" />
                 </div>
 
                 <!-- Permission Groups -->

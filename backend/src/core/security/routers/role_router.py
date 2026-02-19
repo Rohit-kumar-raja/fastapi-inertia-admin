@@ -33,6 +33,13 @@ async def create(role: RoleSchema, session: AsyncSession = Depends(get_db)):
     return response(data=response_data, message="Data created successfully")
 
 
+@role_router.get("/list", status_code=status.HTTP_200_OK, name="admin.role.list")
+async def list_roles(session: AsyncSession = Depends(get_db)):
+    """Get all roles as JSON (for dropdowns/multiselects)."""
+    data = await RoleService.get_all(session=session)
+    return response(data=data, message="Roles fetched successfully")
+
+
 @role_router.get("/{uuid}", status_code=status.HTTP_200_OK, name="admin.role.detail")
 async def edit(uuid: UUID, session: AsyncSession = Depends(get_db)):
     """Read or edit the data based on the given UUID."""

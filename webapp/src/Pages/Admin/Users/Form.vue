@@ -21,7 +21,7 @@ const roles = ref([]);
 const errors = ref<any>({});
 const isEditing = ref(false);
 
-const initialForm={
+const initialForm = {
     username: '',
     email: '',
     phone: '',
@@ -35,7 +35,7 @@ const form = ref(initialForm);
 
 const loadRoles = async () => {
     try {
-        const response = await axios.get(admin.ROLES_API);
+        const response = await axios.get(admin.ROLES_LIST_API);
         roles.value = response.data.data;
     } catch (error) {
         console.error('Error loading roles:', error);

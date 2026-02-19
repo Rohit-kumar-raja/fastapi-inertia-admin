@@ -27,10 +27,9 @@ function toggleExpand(label: string) {
 function isExpanded(label: string) {
     return expandedItems.value.includes(label);
 }
-
+const page = usePage()
 // Active state logic
-const page = usePage();
-const currentPath = computed(() => page.url ? page.url.split(/[?#]/)[0] : '');
+const currentPath = computed(() => new URL(page.url, window.location.origin).pathname);
 
 function isActive(route?: string) {
     if (!route || !currentPath.value) return false;
@@ -113,7 +112,7 @@ watch(currentPath, () => {
                         </div>
 
                         <!-- Submenu -->
-                        <div v-if="item.items" class="grid transition-all duration-300 ease-in-out overflow-hidden"
+                        <div v-if="item.items" class="grid transition-all duration-300 ease-in-out  overflow-hidden"
                             :class="[
                                 isExpanded(item.label) ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0',
                                 isCollapsed ? 'lg:hidden lg:group-hover:grid' : 'block'
