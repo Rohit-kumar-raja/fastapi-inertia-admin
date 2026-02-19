@@ -4,6 +4,7 @@ export const admin = {
     LOGIN_API: `/admin/login`,
     ROLES_API: `/admin/administration/roles`,
     ROLES_FILTER_API: `/admin/administration/roles/filter`,
-    ROUTES_API: `/admin/administration/routes`
-
+    PERMISSIONS_API: `/admin/administration/permissions`,
+    PERMISSIONS_FLAT_API: `/admin/administration/permissions/flat`,
+    PERMISSIONS_SYNC_API: `/admin/administration/permissions/sync`,
 }

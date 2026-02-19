@@ -126,6 +126,7 @@ class PermissionService:
         Returns a summary of created, existing, and deactivated permissions.
         """
         from fastapi.routing import APIRoute
+        from main import app
 
         route_names = set()
         for route in app.routes:

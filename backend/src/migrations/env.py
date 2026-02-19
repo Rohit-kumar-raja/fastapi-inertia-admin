@@ -70,11 +70,8 @@ async def run_async_migrations() -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     
-    connectable = create_async_engine(settings.APP_DATABASE_URL)
-
-    from asyncio import get_event_loop
-    loop = get_event_loop()
-    loop.run_until_complete(run_async_migrations())
+    import asyncio
+    asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():

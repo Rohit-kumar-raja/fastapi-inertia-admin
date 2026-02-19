@@ -13,9 +13,12 @@ from src.core.config.inertia import inertia_config
 from src.apps.admin.routes import admin_router
 from src.core.security.routers import security_router
 
+from src.core.middlewares.rbac_middleware import RBACMiddleware
+
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="secret_key")
+# app.add_middleware(RBACMiddleware)
 app.add_exception_handler(
     InertiaVersionConflictException,
     inertia_version_conflict_exception_handler,  # type: ignore[arg-type]
