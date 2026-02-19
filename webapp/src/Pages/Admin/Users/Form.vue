@@ -89,7 +89,6 @@ const submitForm = async () => {
         if (error.response?.data?.errors) {
             errors.value = error.response.data.errors;
         }
-        console.error('Error saving user:', error);
     } finally {
         loading.value = false;
     }
