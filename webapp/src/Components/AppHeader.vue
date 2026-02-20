@@ -21,7 +21,7 @@ const emit = defineEmits(['toggle-sidebar']);
             <!-- Left: Mobile menu + Breadcrumb -->
             <div class="flex items-center gap-3">
                 <button @click="emit('toggle-sidebar')"
-                    class="lg:hidden w-[34px] h-[34px] flex items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-200"
+                    class="w-[34px] h-[34px] flex items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-200"
                     aria-label="Toggle sidebar">
                     <font-awesome-icon :icon="faBars" class="text-base" />
                 </button>
