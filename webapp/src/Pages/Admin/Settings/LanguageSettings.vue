@@ -219,14 +219,13 @@ defineExpose({ saveLanguage });
                     </button>
                 </div>
             </div>
-        </div>
-
-        <!-- Save Button -->
-        <div class="flex justify-end">
-            <button @click="saveLanguage" :disabled="saving"
-                class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
-                Save Language Settings
-            </button>
+            <!-- Save Button -->
+            <div class="flex justify-end px-6 pb-6">
+                <button @click="saveLanguage" :disabled="saving"
+                    class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                    Save Language Settings
+                </button>
+            </div>
         </div>
     </div>
 </template>

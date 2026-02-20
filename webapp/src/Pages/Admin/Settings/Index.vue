@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faUser, faShieldAlt, faPalette, faBell, faGlobe, faCog, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faShieldAlt, faPalette, faBell, faGlobe, faCog, faBuilding, faSliders } from '@fortawesome/free-solid-svg-icons';
 import ProfileSettings from './ProfileSettings.vue';
 import AccountSettings from './AccountSettings.vue';
 import AppearanceSettings from './AppearanceSettings.vue';
 import NotificationSettings from './NotificationSettings.vue';
 import LanguageSettings from './LanguageSettings.vue';
 import CompanySettings from './CompanySettings.vue';
+import AppSettings from './AppSettings.vue';
 import { usePage } from '@inertiajs/vue3';
 
 const page = usePage();
@@ -23,13 +24,14 @@ const newTabs = [
     { id: 'appearance', label: 'Appearance', icon: faPalette },
     { id: 'notifications', label: 'Notifications', icon: faBell },
     { id: 'language', label: 'Language', icon: faGlobe },
+    { id: 'appsettings', label: 'App Settings', icon: faSliders },
 ];
 </script>
 
 <template>
-    <div class="flex flex-col gap-6 bg-white dark:bg-surface-900">
+    <div class="flex flex-col gap-6 bg-white dark:bg-surface-900 ">
         <!-- ═══════════ Page Header ═══════════ -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 px-5 py-2">
             <div
                 class="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
                 <font-awesome-icon :icon="faCog" class="text-base" />
@@ -66,6 +68,7 @@ const newTabs = [
             <NotificationSettings v-else-if="activeTab === 'notifications'" key="notifications"
                 :app-settings="appSettings" />
             <LanguageSettings v-else-if="activeTab === 'language'" key="language" :company="company" />
+            <AppSettings v-else-if="activeTab === 'appsettings'" key="appsettings" :app-settings="appSettings" />
         </Transition>
     </div>
 </template>

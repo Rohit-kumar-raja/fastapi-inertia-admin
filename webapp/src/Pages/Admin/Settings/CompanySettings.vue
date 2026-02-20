@@ -80,7 +80,7 @@ defineExpose({ saveCompany });
 </script>
 
 <template>
-    <div class="space-y-6 animate-fade-in">
+    <div class="space-y-6 animate-fade-in flex flex-col gap-5">
         <!-- Basic Info -->
         <div
             class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden ">
@@ -184,7 +184,7 @@ defineExpose({ saveCompany });
                     <InputText id="c-addr2" v-model="form.address_line2" class="w-full" />
                     <label for="c-addr2">Address Line 2</label>
                 </FloatLabel>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-5">
                     <FloatLabel variant="on">
                         <InputText id="c-city" v-model="form.city" class="w-full" />
                         <label for="c-city">City</label>
@@ -197,11 +197,12 @@ defineExpose({ saveCompany });
                         <InputText id="c-zip" v-model="form.zip_code" class="w-full" />
                         <label for="c-zip">ZIP Code</label>
                     </FloatLabel>
+                    <FloatLabel variant="on">
+                        <InputText id="c-country" v-model="form.country" class="w-full" />
+                        <label for="c-country">Country</label>
+                    </FloatLabel>
                 </div>
-                <FloatLabel variant="on">
-                    <InputText id="c-country" v-model="form.country" class="w-full" />
-                    <label for="c-country">Country</label>
-                </FloatLabel>
+
             </div>
         </div>
 
@@ -382,14 +383,13 @@ defineExpose({ saveCompany });
                     </FloatLabel>
                 </div>
             </div>
-        </div>
-
-        <!-- Save Button -->
-        <div class="flex justify-end">
-            <button @click="saveCompany" :disabled="saving"
-                class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
-                Save Company Info
-            </button>
+            <!-- Save Button -->
+            <div class="flex justify-end px-6 pb-6">
+                <button @click="saveCompany" :disabled="saving"
+                    class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                    Save Company Info
+                </button>
+            </div>
         </div>
     </div>
 </template>

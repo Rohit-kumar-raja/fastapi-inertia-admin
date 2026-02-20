@@ -133,13 +133,14 @@ defineExpose({ saveProfile: changePassword });
                             inputClass="w-full" class="w-full [&>input]:w-full" />
                         <label for="pw-confirm">Confirm Password</label>
                     </FloatLabel>
-                    <div>
-                        <button @click="changePassword" :disabled="saving"
-                            class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
-                            Update Password
-                        </button>
-                    </div>
                 </div>
+            </div>
+            <!-- Save Button -->
+            <div class="flex justify-end px-6 pb-6">
+                <button @click="changePassword" :disabled="saving"
+                    class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                    Update Password
+                </button>
             </div>
         </div>
 

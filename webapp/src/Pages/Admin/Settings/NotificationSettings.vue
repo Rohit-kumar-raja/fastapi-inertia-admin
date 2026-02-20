@@ -154,7 +154,7 @@ const badgeEnabled = ref(true);
 
         <!-- Quiet Hours -->
         <div
-            class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
+            class="h-full rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
             <div
                 class="px-6 py-4 border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/30">
                 <div class="flex items-center justify-between">
