@@ -8,6 +8,7 @@ from sqlalchemy.orm import configure_mappers
 from core.config.settings import settings
 from core.config.database import Base
 from core.security.models import *
+from apps.admin.models import *
 
 target_metadata = Base.metadata
 

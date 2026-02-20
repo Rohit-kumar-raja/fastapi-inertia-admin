@@ -1,201 +1,137 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faUser, faShieldAlt, faPalette, faBell, faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faShieldAlt, faPalette, faBell, faGlobe, faCog, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import ProfileSettings from './ProfileSettings.vue';
+import AccountSettings from './AccountSettings.vue';
+import AppearanceSettings from './AppearanceSettings.vue';
+import NotificationSettings from './NotificationSettings.vue';
+import LanguageSettings from './LanguageSettings.vue';
+import CompanySettings from './CompanySettings.vue';
+import { usePage } from '@inertiajs/vue3';
 
+const page = usePage();
+const user = computed(() => (page.props as any).user || null);
+const company = computed(() => (page.props as any).company || null);
+const appSettings = computed(() => (page.props as any).app_settings || []);
 
 const activeTab = ref('profile');
+const profileRef = ref<InstanceType<typeof ProfileSettings> | null>(null);
+const accountRef = ref<InstanceType<typeof AccountSettings> | null>(null);
+const companyRef = ref<InstanceType<typeof CompanySettings> | null>(null);
+const languageRef = ref<InstanceType<typeof LanguageSettings> | null>(null);
 
-const tabs = [
+const newTabs = [
     { id: 'profile', label: 'Profile', icon: faUser },
-    { id: 'account', label: 'Account', icon: faShieldAlt },
+    { id: 'company', label: 'Company', icon: faBuilding },
+    { id: 'account', label: 'Security', icon: faShieldAlt },
     { id: 'appearance', label: 'Appearance', icon: faPalette },
     { id: 'notifications', label: 'Notifications', icon: faBell },
-    { id: 'language', label: 'Language & Region', icon: faGlobe },
+    { id: 'language', label: 'Language', icon: faGlobe },
 ];
 
-const profileForm = ref({
-    fullName: 'Amy Elsner',
-    email: 'amy@example.com',
-    bio: 'Product Designer based in San Francisco.',
-    role: 'Administrator'
-});
+const savableTabs = ['profile', 'account', 'company', 'language'];
 
-const themeSettings = ref({
-    mode: 'system'
-});
+const handleSave = () => {
+    if (activeTab.value === 'profile' && profileRef.value) {
+        profileRef.value.saveProfile();
+    } else if (activeTab.value === 'account' && accountRef.value) {
+        accountRef.value.saveProfile();
+    } else if (activeTab.value === 'company' && companyRef.value) {
+        companyRef.value.saveCompany();
+    } else if (activeTab.value === 'language' && languageRef.value) {
+        languageRef.value.saveLanguage();
+    }
+};
 </script>
 
 <template>
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Settings</h1>
-        <p class="text-slate-500 dark:text-slate-400 mb-8">Manage your account settings and preferences.</p>
-
-        <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar Navigation -->
-            <aside class="w-full lg:w-64 shrink-0">
-                <nav class="space-y-1">
-                    <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
-                        class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200"
-                        :class="[
-                            activeTab === tab.id
-                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 shadow-sm'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200'
-                        ]">
-                        <font-awesome-icon :icon="tab.icon" class="text-base" :class="[
-                            activeTab === tab.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
-                        ]" />
-                        {{ tab.label }}
-                    </button>
-                </nav>
-            </aside>
-
-            <!-- Content Area -->
-            <div class="flex-1 min-w-0">
+    <div class="flex flex-col gap-6 bg-white dark:bg-surface-900">
+        <!-- ═══════════ Page Header ═══════════ -->
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
                 <div
-                    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-
-                    <!-- Profile Section -->
-                    <div v-if="activeTab === 'profile'" class="p-6 lg:p-8 space-y-8 animate-fade-in">
-                        <div>
-                            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Public Profile</h2>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">This information will be
-                                displayed publicly.</p>
-                        </div>
-
-                        <div
-                            class="flex flex-col sm:flex-row items-start gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                            <!-- Avatar -->
-                            <div class="relative group cursor-pointer">
-                                <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" alt="Profile"
-                                    class="w-24 h-24 rounded-2xl object-cover ring-4 ring-white dark:ring-slate-800 shadow-lg group-hover:opacity-90 transition-opacity" />
-                                <div
-                                    class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span class="text-white text-xs font-medium">Change</span>
-                                </div>
-                            </div>
-
-                            <!-- Fields -->
-                            <div class="flex-1 space-y-5 w-full max-w-xl">
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Full
-                                        Name</label>
-                                    <input type="text" v-model="profileForm.fullName"
-                                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all" />
-                                </div>
-
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Bio</label>
-                                    <textarea v-model="profileForm.bio" rows="3"
-                                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"></textarea>
-                                    <p class="mt-1.5 text-xs text-slate-400">Brief description for your profile. URLs
-                                        are hyperlinked.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Account Section -->
-                    <div v-else-if="activeTab === 'account'" class="p-6 lg:p-8 space-y-8 animate-fade-in">
-                        <div>
-                            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Account Security</h2>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage your password and
-                                authentication methods.</p>
-                        </div>
-
-                        <div
-                            class="bg-indigo-50 dark:bg-indigo-500/10 rounded-xl p-4 border border-indigo-100 dark:border-indigo-500/20 flex gap-4">
-                            <div
-                                class="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg text-indigo-600 dark:text-indigo-400 shrink-0 h-fit">
-                                <font-awesome-icon :icon="faShieldAlt" />
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-indigo-900 dark:text-indigo-200">Two-Factor
-                                    Authentication</h3>
-                                <p class="text-xs text-indigo-700 dark:text-indigo-300/70 mt-1 mb-3">Add an extra layer
-                                    of security to your account.</p>
-                                <button
-                                    class="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg transition-colors">
-                                    Enable 2FA
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="pt-6 border-t border-slate-100 dark:border-slate-800">
-                            <h3 class="text-sm font-medium text-slate-900 dark:text-white mb-4">Change Password</h3>
-                            <div class="grid gap-4 max-w-sm">
-                                <input type="password" placeholder="Current Password"
-                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-indigo-500 outline-none" />
-                                <input type="password" placeholder="New Password"
-                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-indigo-500 outline-none" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Appearance Section -->
-                    <div v-else-if="activeTab === 'appearance'" class="p-6 lg:p-8 space-y-8 animate-fade-in">
-                        <div>
-                            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Appearance</h2>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Customize the interface look and
-                                feel.</p>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-4">
-                            <button @click="themeSettings.mode = 'light'"
-                                class="border-2 rounded-xl p-2 hover:border-indigo-500 transition-all text-left group"
-                                :class="themeSettings.mode === 'light' ? 'border-indigo-500 ring-2 ring-indigo-500/20 bg-indigo-50/50' : 'border-slate-200 dark:border-slate-700'">
-                                <div
-                                    class="h-24 bg-slate-100 rounded-lg mb-3 border border-slate-200 relative overflow-hidden">
-                                    <div class="absolute inset-y-0 left-0 w-1/4 bg-white border-r border-slate-200">
-                                    </div>
-                                </div>
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Light</span>
-                            </button>
-                            <button @click="themeSettings.mode = 'dark'"
-                                class="border-2 rounded-xl p-2 hover:border-indigo-500 transition-all text-left group"
-                                :class="themeSettings.mode === 'dark' ? 'border-indigo-500 ring-2 ring-indigo-500/20 bg-indigo-50/50' : 'border-slate-200 dark:border-slate-700'">
-                                <div
-                                    class="h-24 bg-slate-900 rounded-lg mb-3 border border-slate-700 relative overflow-hidden">
-                                    <div class="absolute inset-y-0 left-0 w-1/4 bg-slate-800 border-r border-slate-700">
-                                    </div>
-                                </div>
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Dark</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Footer Actions -->
-                    <div
-                        class="bg-slate-50 dark:bg-slate-800/50 px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-3">
-                        <button
-                            class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-slate-600 transition-all">Cancel</button>
-                        <button
-                            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm shadow-indigo-500/20 transition-all">Save
-                            Changes</button>
-                    </div>
-
+                    class="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
+                    <font-awesome-icon :icon="faCog" class="text-base" />
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-surface-900 dark:text-white">Settings</h1>
+                    <p class="text-xs text-surface-500 dark:text-surface-400">Manage your account and preferences</p>
                 </div>
             </div>
+            <button v-if="savableTabs.includes(activeTab)" @click="handleSave"
+                class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5">
+                Save Changes
+            </button>
         </div>
+
+        <!-- ═══════════ Horizontal Tabs ═══════════ -->
+        <div
+            class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 shadow-sm overflow-hidden">
+            <nav class="flex overflow-x-auto scrollbar-none">
+                <button v-for="ntab in newTabs" :key="ntab.id" @click="activeTab = ntab.id"
+                    class="relative flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap transition-all duration-200 border-b-2"
+                    :class="[
+                        activeTab === ntab.id
+                            ? 'text-indigo-600 dark:text-indigo-400 border-indigo-600 dark:border-indigo-400 bg-indigo-50/50 dark:bg-indigo-500/5'
+                            : 'text-surface-500 dark:text-surface-400 border-transparent hover:text-surface-700 dark:hover:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800/50'
+                    ]">
+                    <font-awesome-icon :icon="ntab.icon" class="text-xs" />
+                    {{ ntab.label }}
+                </button>
+            </nav>
+        </div>
+
+        <!-- ═══════════ Content Area ═══════════ -->
+        <Transition name="settings-fade" mode="out-in">
+            <ProfileSettings v-if="activeTab === 'profile'" key="profile" ref="profileRef" :user="user" />
+            <CompanySettings v-else-if="activeTab === 'company'" key="company" ref="companyRef" :company="company" />
+            <AccountSettings v-else-if="activeTab === 'account'" key="account" ref="accountRef" />
+            <AppearanceSettings v-else-if="activeTab === 'appearance'" key="appearance" :app-settings="appSettings" />
+            <NotificationSettings v-else-if="activeTab === 'notifications'" key="notifications"
+                :app-settings="appSettings" />
+            <LanguageSettings v-else-if="activeTab === 'language'" key="language" ref="languageRef"
+                :company="company" />
+        </Transition>
     </div>
 </template>
 
 <style scoped>
-.animate-fade-in {
-    animation: fadeIn 0.3s ease-out forwards;
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
 }
 
-@keyframes fadeIn {
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.settings-fade-enter-active {
+    animation: settingsFadeIn 0.3s ease-out;
+}
+
+.settings-fade-leave-active {
+    animation: settingsFadeOut 0.15s ease-in;
+}
+
+@keyframes settingsFadeIn {
     from {
         opacity: 0;
-        transform: translateY(4px);
+        transform: translateY(6px);
     }
 
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes settingsFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
     }
 }
 </style>

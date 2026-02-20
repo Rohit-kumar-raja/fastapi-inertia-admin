@@ -1,3 +1,7 @@
-#Register all the model here Example below 
+from .company_info_model import CompanyInfoModel
+from .app_setting_model import AppSettingModel
 
-#from .user_model import UserModel
+__all__ = [
+    "CompanyInfoModel",
+    "AppSettingModel",
+]

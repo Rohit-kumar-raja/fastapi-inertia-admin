@@ -11,30 +11,17 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppBreadCrumb: typeof import('./components/AppBreadCrumb.vue')['default']
-    AppHeader: typeof import('./components/AppHeader.vue')['default']
-    AppSidebar: typeof import('./components/AppSidebar.vue')['default']
     Avatar: typeof import('primevue/avatar')['default']
-    Badge: typeof import('primevue/badge')['default']
     Button: typeof import('primevue/button')['default']
-    Card: typeof import('primevue/card')['default']
     Chart: typeof import('primevue/chart')['default']
     Checkbox: typeof import('primevue/checkbox')['default']
     Column: typeof import('primevue/column')['default']
-    ConfirmPopup: typeof import('primevue/confirmpopup')['default']
     DataTable: typeof import('primevue/datatable')['default']
-    Dialog: typeof import('primevue/dialog')['default']
     IconField: typeof import('primevue/iconfield')['default']
     InputIcon: typeof import('primevue/inputicon')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
     Password: typeof import('primevue/password')['default']
-    Popover: typeof import('primevue/popover')['default']
-    SideBarFooter: typeof import('./components/SideBarFooter.vue')['default']
-    SideBarHeader: typeof import('./components/SideBarHeader.vue')['default']
     Tag: typeof import('primevue/tag')['default']
-  }
-  export interface GlobalDirectives {
-    Tooltip: typeof import('primevue/tooltip')['default']
   }
 }

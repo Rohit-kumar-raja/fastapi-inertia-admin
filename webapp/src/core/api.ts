@@ -11,4 +11,9 @@ export const admin = {
     NOTIFICATIONS_API: `/admin/notifications`,
     NOTIFICATIONS_COUNT_API: `/admin/notifications/count`,
     NOTIFICATIONS_READ_ALL_API: `/admin/notifications/read-all`,
+    SETTINGS_PROFILE_API: `/admin/settings/profile`,
+    SETTINGS_PASSWORD_API: `/admin/settings/password`,
+    SETTINGS_COMPANY_API: `/admin/settings/company`,
+    SETTINGS_APP_API: `/admin/settings/app`,
+    SETTINGS_APP_BULK_API: `/admin/settings/app/bulk`,
 }
