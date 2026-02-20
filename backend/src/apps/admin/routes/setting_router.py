@@ -6,4 +6,4 @@ setting_router = APIRouter(dependencies=[Depends(web_auth)])
 
 @setting_router.get("/settings")
 async def settings(inertia: InertiaDep):
-    return await inertia.render("Dashboard")
+    return await inertia.render("Admin/Settings/Index")
