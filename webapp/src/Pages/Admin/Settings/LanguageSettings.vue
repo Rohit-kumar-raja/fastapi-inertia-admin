@@ -87,7 +87,7 @@ defineExpose({ saveLanguage });
 </script>
 
 <template>
-    <div class="space-y-6 animate-fade-in">
+    <div class="space-y-6 animate-fade-in flex flex-col gap-5">
         <!-- Language Selection -->
         <div
             class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
@@ -153,79 +153,13 @@ defineExpose({ saveLanguage });
                 </FloatLabel>
             </div>
         </div>
-
-        <!-- Date & Number Format -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Date Format -->
-            <div
-                class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
-                <div
-                    class="px-6 py-4 border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/30">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white">
-                            <font-awesome-icon :icon="faCalendarAlt" class="text-xs" />
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-semibold text-surface-900 dark:text-white">Date Format</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-6 pb-8 space-y-2">
-                    <button v-for="format in dateFormats" :key="format" @click="selectedDateFormat = format"
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-left text-sm transition-all duration-200"
-                        :class="[
-                            selectedDateFormat === format
-                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-semibold'
-                                : 'text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800'
-                        ]">
-                        <span>{{ format }}</span>
-                        <font-awesome-icon v-if="selectedDateFormat === format" :icon="faCheck"
-                            class="text-indigo-600 text-xs" />
-                    </button>
-                </div>
-            </div>
-
-            <!-- Currency -->
-            <div
-                class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
-                <div
-                    class="px-6 py-4 border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/30">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-linear-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white">
-                            <font-awesome-icon :icon="faMoneyBillWave" class="text-xs" />
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-semibold text-surface-900 dark:text-white">Currency</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-6 pb-8 space-y-2">
-                    <button v-for="currency in currencies" :key="currency.code"
-                        @click="selectedCurrency = currency.code"
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-left text-sm transition-all duration-200"
-                        :class="[
-                            selectedCurrency === currency.code
-                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-semibold'
-                                : 'text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800'
-                        ]">
-                        <span class="flex items-center gap-2">
-                            <span class="w-6 text-center font-mono text-base">{{ currency.symbol }}</span>
-                            {{ currency.name }} ({{ currency.code }})
-                        </span>
-                        <font-awesome-icon v-if="selectedCurrency === currency.code" :icon="faCheck"
-                            class="text-indigo-600 text-xs" />
-                    </button>
-                </div>
-            </div>
-            <!-- Save Button -->
-            <div class="flex justify-end px-6 pb-6">
-                <button @click="saveLanguage" :disabled="saving"
-                    class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
-                    Save Language Settings
-                </button>
-            </div>
+        <div class="flex justify-end px-6 mt-9 pb-6">
+            <button @click="saveLanguage" :disabled="saving"
+                class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                Save Language Settings
+            </button>
         </div>
+        <!-- Date & Number Format -->
+
     </div>
 </template>

@@ -41,7 +41,7 @@ const setToggle = (key: string, value: boolean) => emit('update:value', key, val
 </script>
 
 <template>
-    <div class="space-y-5">
+    <div class="space-y-5 flex flex-col gap-5 pt-1.5">
         <div v-for="(section, sIdx) in config.sections" :key="sIdx"
             class="rounded-2xl shadow-sm border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
             <!-- Section Header -->

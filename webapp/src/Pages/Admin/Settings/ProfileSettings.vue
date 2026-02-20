@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCamera, faUser, faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faCamera, faUser, faKey } from '@fortawesome/free-solid-svg-icons';
 import FloatLabel from 'primevue/floatlabel';
 import { useToast } from 'primevue';
 import axios from 'axios';
@@ -11,17 +11,26 @@ const props = defineProps<{
 
 const toast = useToast();
 const saving = ref(false);
+const savingPassword = ref(false);
 
 const profileForm = ref({
     username: '',
     email: '',
+    alternate_email: '',
     phone: '',
+});
+
+const passwordForm = ref({
+    current_password: '',
+    new_password: '',
+    confirm_password: '',
 });
 
 watchEffect(() => {
     if (props.user) {
         profileForm.value.username = props.user.username || '';
         profileForm.value.email = props.user.email || '';
+        profileForm.value.alternate_email = props.user.alternate_email || '';
         profileForm.value.phone = props.user.phone || '';
     }
 });
@@ -47,11 +56,35 @@ const saveProfile = async () => {
     }
 };
 
+const changePassword = async () => {
+    if (passwordForm.value.new_password !== passwordForm.value.confirm_password) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match', life: 3000 });
+        return;
+    }
+    savingPassword.value = true;
+    try {
+        const { data } = await axios.put('/admin/settings/password', passwordForm.value);
+        if (data.success) {
+            toast.add({ severity: 'success', summary: 'Success', detail: 'Password changed successfully', life: 3000 });
+            passwordForm.value = { current_password: '', new_password: '', confirm_password: '' };
+        }
+    } catch (error: any) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'Failed to change password',
+            life: 3000,
+        });
+    } finally {
+        savingPassword.value = false;
+    }
+};
+
 defineExpose({ saveProfile });
 </script>
 
 <template>
-    <div class="space-y-6 animate-fade-in h-full">
+    <div class="space-y-6 animate-fade-in h-full flex flex-col gap-4">
         <!-- Profile Card -->
         <div
             class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
@@ -101,7 +134,7 @@ defineExpose({ saveProfile });
 
         <!-- Personal Information -->
         <div
-            class="rounded-2xl lg:h-[calc(100vh-555px)] border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
+            class="rounded-2xl  border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
             <div
                 class="px-6 py-4 border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/30">
                 <div class="flex items-center gap-3">
@@ -115,7 +148,7 @@ defineExpose({ saveProfile });
                     </div>
                 </div>
             </div>
-            <div class="p-6 pb-8">
+            <div class="p-6">
                 <div class="flex flex-col gap-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <FloatLabel variant="on">
@@ -132,6 +165,11 @@ defineExpose({ saveProfile });
                             <InputText id="profile-phone" v-model="profileForm.phone" class="w-full" />
                             <label for="profile-phone">Phone</label>
                         </FloatLabel>
+                        <FloatLabel variant="on">
+                            <InputText id="profile-alt-email" v-model="profileForm.alternate_email" type="email"
+                                class="w-full" />
+                            <label for="profile-alt-email">Alternate Email</label>
+                        </FloatLabel>
                     </div>
                 </div>
             </div>
@@ -139,7 +177,51 @@ defineExpose({ saveProfile });
             <div class="flex justify-end px-6 pb-6">
                 <button @click="saveProfile" :disabled="saving"
                     class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
-                    Save Profile
+                    {{ saving ? 'Saving...' : 'Save Profile' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div
+            class="rounded-2xl mt-5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
+            <div
+                class="px-6 py-4 border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/30">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white">
+                        <font-awesome-icon :icon="faKey" class="text-xs" />
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-surface-900 dark:text-white">Change Password</h3>
+                        <p class="text-xs text-surface-500 dark:text-surface-400">Ensure your account uses a strong
+                            password</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="max-w-md flex flex-col gap-6">
+                    <FloatLabel variant="on">
+                        <Password id="pw-current" v-model="passwordForm.current_password" :feedback="false" toggleMask
+                            inputClass="w-full" class="w-full [&>input]:w-full" />
+                        <label for="pw-current">Current Password</label>
+                    </FloatLabel>
+                    <FloatLabel variant="on">
+                        <Password id="pw-new" v-model="passwordForm.new_password" :feedback="false" toggleMask
+                            inputClass="w-full" class="w-full [&>input]:w-full" />
+                        <label for="pw-new">New Password</label>
+                    </FloatLabel>
+                    <FloatLabel variant="on">
+                        <Password id="pw-confirm" v-model="passwordForm.confirm_password" :feedback="false" toggleMask
+                            inputClass="w-full" class="w-full [&>input]:w-full" />
+                        <label for="pw-confirm">Confirm Password</label>
+                    </FloatLabel>
+                </div>
+            </div>
+            <div class="flex justify-end px-6 pb-6">
+                <button @click="changePassword" :disabled="savingPassword"
+                    class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                    {{ savingPassword ? 'Updating...' : 'Update Password' }}
                 </button>
             </div>
         </div>
