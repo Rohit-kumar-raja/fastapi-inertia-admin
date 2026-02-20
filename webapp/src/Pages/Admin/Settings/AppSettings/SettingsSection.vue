@@ -61,7 +61,7 @@ const setToggle = (key: string, value: boolean) => emit('update:value', key, val
             </div>
 
             <!-- Fields -->
-            <div class="p-6 flex flex-col gap-5">
+            <div class="p-6 pb-8 flex flex-col gap-5">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <template v-for="field in section.fields" :key="field.key">
                         <!-- Toggle -->

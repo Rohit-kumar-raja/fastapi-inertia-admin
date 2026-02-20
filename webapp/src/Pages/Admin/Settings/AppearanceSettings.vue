@@ -71,7 +71,7 @@ const themes = [
                 <h3 class="text-sm font-semibold text-surface-900 dark:text-white">Theme</h3>
                 <p class="text-xs text-surface-500 dark:text-surface-400 mt-0.5">Select your preferred color scheme</p>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <button v-for="themeItem in themes" :key="themeItem.id" @click="themeMode = themeItem.id"
                         class="relative group rounded-2xl p-4 border-2 transition-all duration-300 text-left" :class="[
@@ -118,7 +118,7 @@ const themes = [
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-surface-900 dark:text-white">{{ themeItem.label
-                                        }}</p>
+                                    }}</p>
                                     <p class="text-[11px] text-surface-500 dark:text-surface-400">{{ themeItem.desc }}
                                     </p>
                                 </div>
@@ -149,7 +149,7 @@ const themes = [
                     </div>
                 </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <div class="flex flex-wrap gap-3">
                     <button v-for="color in accentColors" :key="color.id" @click="accentColor = color.id"
                         class="group relative w-14 h-14 rounded-2xl transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:shadow-lg"
@@ -176,7 +176,7 @@ const themes = [
                 <p class="text-xs text-surface-500 dark:text-surface-400 mt-0.5">Adjust the text size across the
                     interface</p>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <div class="flex items-center gap-4 max-w-sm">
                     <span class="text-xs text-surface-500 font-medium">A</span>
                     <div class="flex-1 flex items-center gap-1">
@@ -204,7 +204,7 @@ const themes = [
                 <p class="text-xs text-surface-500 dark:text-surface-400 mt-0.5">Choose your preferred navigation layout
                 </p>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <div class="grid grid-cols-2 gap-4 max-w-md">
                     <button @click="sidebarStyle = 'default'"
                         class="rounded-xl border-2 p-3 transition-all duration-300 text-left"

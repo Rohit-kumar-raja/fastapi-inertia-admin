@@ -115,7 +115,7 @@ defineExpose({ saveProfile });
                     </div>
                 </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <div class="flex flex-col gap-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <FloatLabel variant="on">

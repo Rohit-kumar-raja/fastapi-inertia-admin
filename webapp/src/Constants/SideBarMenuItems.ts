@@ -46,7 +46,7 @@ export const SideBarMenuItems = ref([
     {
         label: 'Settings',
         icon: faCog,
-        route: '/settings'
+        route: '/admin/settings'
     },
     {
         separator: true

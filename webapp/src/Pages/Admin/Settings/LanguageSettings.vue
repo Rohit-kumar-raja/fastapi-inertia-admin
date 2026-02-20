@@ -104,7 +104,7 @@ defineExpose({ saveLanguage });
                     </div>
                 </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <button v-for="lang in languages" :key="lang.code" @click="selectedLanguage = lang.code"
                         class="relative group flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-300 text-left"
@@ -145,7 +145,7 @@ defineExpose({ saveLanguage });
                     </div>
                 </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <FloatLabel variant="on" class="w-full max-w-lg">
                     <Select id="tz-select" v-model="selectedTimezone" :options="timezones" optionLabel="label"
                         optionValue="value" class="w-full" />
@@ -171,7 +171,7 @@ defineExpose({ saveLanguage });
                         </div>
                     </div>
                 </div>
-                <div class="p-6 space-y-2">
+                <div class="p-6 pb-8 space-y-2">
                     <button v-for="format in dateFormats" :key="format" @click="selectedDateFormat = format"
                         class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-left text-sm transition-all duration-200"
                         :class="[
@@ -201,7 +201,7 @@ defineExpose({ saveLanguage });
                         </div>
                     </div>
                 </div>
-                <div class="p-6 space-y-2">
+                <div class="p-6 pb-8 space-y-2">
                     <button v-for="currency in currencies" :key="currency.code"
                         @click="selectedCurrency = currency.code"
                         class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-left text-sm transition-all duration-200"

@@ -116,7 +116,7 @@ defineExpose({ saveProfile: changePassword });
                     </div>
                 </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 pb-8">
                 <div class="max-w-md flex flex-col gap-6">
                     <FloatLabel variant="on">
                         <Password id="pw-current" v-model="passwordForm.current_password" :feedback="false" toggleMask

@@ -171,7 +171,7 @@ const badgeEnabled = ref(true);
                     </label>
                 </div>
             </div>
-            <div v-if="quietHoursEnabled" class="p-6">
+            <div v-if="quietHoursEnabled" class="p-6 pb-8">
                 <div class="flex items-end gap-4 max-w-sm">
                     <div class="flex-1">
                         <FloatLabel variant="on">
