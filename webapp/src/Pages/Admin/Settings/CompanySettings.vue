@@ -83,7 +83,7 @@ defineExpose({ saveCompany });
     <div class="space-y-6 animate-fade-in">
         <!-- Basic Info -->
         <div
-            class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden">
+            class="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 overflow-hidden ">
             <div
                 class="px-6 py-4 border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/30">
                 <div class="flex items-center gap-3">
@@ -382,6 +382,14 @@ defineExpose({ saveCompany });
                     </FloatLabel>
                 </div>
             </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-end">
+            <button @click="saveCompany" :disabled="saving"
+                class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                Save Company Info
+            </button>
         </div>
     </div>
 </template>

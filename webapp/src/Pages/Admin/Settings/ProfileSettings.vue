@@ -86,7 +86,7 @@ defineExpose({ saveProfile });
                         <div class="flex items-start justify-between">
                             <div>
                                 <h3 class="text-xl font-bold text-surface-900 dark:text-white">{{ profileForm.username
-                                }}</h3>
+                                    }}</h3>
                                 <p class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">
                                     Administrator</p>
                             </div>
@@ -133,6 +133,12 @@ defineExpose({ saveProfile });
                             <InputText id="profile-phone" v-model="profileForm.phone" class="w-full" />
                             <label for="profile-phone">Phone</label>
                         </FloatLabel>
+                    </div>
+                    <div>
+                        <button @click="saveProfile" :disabled="saving"
+                            class="inline-flex items-center gap-2 text-sm font-semibold bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                            Save Profile
+                        </button>
                     </div>
                 </div>
             </div>
