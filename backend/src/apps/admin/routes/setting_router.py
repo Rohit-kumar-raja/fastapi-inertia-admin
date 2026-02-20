@@ -33,6 +33,19 @@ async def settings(request: Request, inertia: InertiaDep, session: AsyncSession 
 
 # ─── User Profile ───────────────────────────────────────────
 
+@setting_router.get("/settings/profile")
+async def get_profile(
+    request: Request,
+    session: AsyncSession = Depends(get_db),
+):
+    """Get current user's profile."""
+    current_user = request.state.user
+    user_data = await SettingService.get_user_profile(current_user["id"], session)
+    if not user_data:
+        return error_response(message="User not found", status_code=404)
+    return response(data=user_data, message="Profile fetched successfully")
+
+
 @setting_router.put("/settings/profile")
 async def update_profile(
     data: ProfileUpdateSchema,

@@ -31,17 +31,19 @@ const MyPreset = definePreset(Aura, {
 
 const pinia = createPinia()
 
-axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('access_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      // using window.location to force full reload and clear any state
+      window.location.href = '/admin/login'
+    }
+    return Promise.reject(error)
   }
-  return config
-})
+)
 
 createInertiaApp({
   resolve: async (name: string) => {
-    console.log(name)
     const pages = import.meta.glob('./Pages/**/*.vue')
     const page: any = await pages[`./Pages/${name}.vue`]?.()
     if (name.startsWith('Admin/')) {

@@ -8,6 +8,7 @@ class ProfileUpdateSchema(BaseSchema):
     username: str = Field(max_length=150, description="Username")
     email: EmailStr = Field(description="Email Address")
     phone: Optional[str] = Field(None, max_length=20, description="Phone Number")
+    avatar: Optional[str] = Field(None, max_length=500, description="Avatar URL")
 
 
 class PasswordChangeSchema(BaseSchema):

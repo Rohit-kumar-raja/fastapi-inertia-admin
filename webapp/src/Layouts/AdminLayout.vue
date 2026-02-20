@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import AppSidebar from "@/Components/AppSidebar.vue";
 import AppHeader from "@/Components/AppHeader.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import AppFooter from "@/Components/AppFooter.vue";
+import { useUserStore } from "@/Store/userStore";
 
 const isMobileSidebarOpen = ref(false);
 const isDesktopSidebarCollapsed = ref(false);
+const userStore = useUserStore();
+
+onMounted(() => {
+    if (userStore.isAuthenticated && !userStore.user) {
+        userStore.fetchUser();
+    }
+});
 
 function toggleSidebar() {
     if (window.innerWidth >= 1024) { // lg breakpoint
@@ -30,7 +38,7 @@ function toggleSidebar() {
             <main class="flex-1 overflow-y-auto p-1">
                 <slot />
             </main>
-            <AppFooter/>
+            <AppFooter />
         </div>
     </div>
 </template>

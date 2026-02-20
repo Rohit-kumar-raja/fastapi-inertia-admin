@@ -4,9 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUser, faCog, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useUserStore } from '@/Store/userStore';
 import Menu from 'primevue/menu';
+import { computed } from 'vue';
 
 const userStore = useUserStore();
 const userMenu = ref();
+const avatarUrl = computed(() => userStore.user?.avatar || "https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png");
 
 const userMenuItems = ref<Array<Record<string, any>>>([
     {
@@ -39,7 +41,7 @@ function toggleUserMenu(event: Event) {
         <button @click="toggleUserMenu"
             class="group relative flex items-center justify-center p-[2px] rounded-full transition-transform duration-200 hover:scale-105 outline-none focus:ring-2 focus:ring-primary-500/50"
             aria-label="User menu">
-            <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" alt="User"
+            <img :src="avatarUrl" alt="User"
                 class="w-8 h-8 rounded-full object-cover border-2 border-slate-200 dark:border-white/10 group-hover:border-indigo-400 transition-colors duration-200" />
             <span
                 class="absolute bottom-px right-px w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-surface-900"></span>
@@ -49,9 +51,11 @@ function toggleUserMenu(event: Event) {
     <Menu ref="userMenu" :model="userMenuItems" :popup="true"
         class="border-0! shadow-xl! rounded-2xl! p-0! overflow-hidden bg-white dark:bg-slate-900 border-slate-100 dark:border-white/5 w-[200px]">
         <template #start>
-            <div class="px-4 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5">
-                <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Amy Elsner</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">amy@example.com</p>
+            <div v-if="userStore.user"
+                class="px-4 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5">
+                <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ userStore.user.username }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">{{ userStore.user.email ||
+                    'admin@example.com' }}</p>
             </div>
         </template>
         <template #item="{ item }">

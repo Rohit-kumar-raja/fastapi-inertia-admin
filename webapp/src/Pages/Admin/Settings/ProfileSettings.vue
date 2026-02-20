@@ -4,11 +4,14 @@ import { faCamera, faUser, faKey } from '@fortawesome/free-solid-svg-icons';
 import FloatLabel from 'primevue/floatlabel';
 import { useToast } from 'primevue';
 import axios from 'axios';
+import { useUserStore } from '@/Store/userStore';
+import { watchEffect, ref, computed } from 'vue';
 
 const props = defineProps<{
     user?: any;
 }>();
 
+const userStore = useUserStore();
 const toast = useToast();
 const saving = ref(false);
 const savingPassword = ref(false);
@@ -18,6 +21,7 @@ const profileForm = ref({
     email: '',
     alternate_email: '',
     phone: '',
+    avatar: '',
 });
 
 const passwordForm = ref({
@@ -27,15 +31,43 @@ const passwordForm = ref({
 });
 
 watchEffect(() => {
-    if (props.user) {
-        profileForm.value.username = props.user.username || '';
-        profileForm.value.email = props.user.email || '';
-        profileForm.value.alternate_email = props.user.alternate_email || '';
-        profileForm.value.phone = props.user.phone || '';
+    // Prefer store user data as truth
+    const sourceUser = userStore.user || props.user;
+    if (sourceUser) {
+        profileForm.value.username = sourceUser.username || '';
+        profileForm.value.email = sourceUser.email || '';
+        profileForm.value.alternate_email = sourceUser.alternate_email || '';
+        profileForm.value.phone = sourceUser.phone || '';
+        profileForm.value.avatar = sourceUser.avatar || '';
     }
 });
 
-const avatarUrl = ref('https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png');
+const avatarUrl = computed(() => profileForm.value.avatar || 'https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png');
+
+const onAvatarChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+        const file = target.files[0];
+
+        // Ensure it's an image and not too large (e.g., < 2MB)
+        if (!file.type.startsWith('image/')) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Please upload a valid image file', life: 3000 });
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Image size must be less than 2MB', life: 3000 });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (e.target?.result) {
+                profileForm.value.avatar = e.target.result as string;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
 const saveProfile = async () => {
     saving.value = true;
@@ -43,6 +75,8 @@ const saveProfile = async () => {
         const { data } = await axios.put('/admin/settings/profile', profileForm.value);
         if (data.success) {
             toast.add({ severity: 'success', summary: 'Success', detail: 'Profile updated successfully', life: 3000 });
+            // Sync with Pinia store so the sidebar and header update immediately
+            await userStore.fetchUser();
         }
     } catch (error: any) {
         toast.add({
@@ -100,17 +134,20 @@ defineExpose({ saveProfile });
                 <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12">
                     <!-- Avatar -->
                     <div class="relative group cursor-pointer shrink-0">
+                        <input type="file" id="avatarUpload" accept="image/*" class="hidden" @change="onAvatarChange" />
+                        <label for="avatarUpload" class="cursor-pointer block">
+                            <div
+                                class="w-24 h-24 rounded-2xl overflow-hidden ring-4 ring-white dark:ring-surface-900 shadow-xl">
+                                <img :src="avatarUrl" alt="Profile"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-white" />
+                            </div>
+                            <div
+                                class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
+                                <font-awesome-icon :icon="faCamera" class="text-white text-lg" />
+                            </div>
+                        </label>
                         <div
-                            class="w-24 h-24 rounded-2xl overflow-hidden ring-4 ring-white dark:ring-surface-900 shadow-xl">
-                            <img :src="avatarUrl" alt="Profile"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        </div>
-                        <div
-                            class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
-                            <font-awesome-icon :icon="faCamera" class="text-white text-lg" />
-                        </div>
-                        <div
-                            class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-[3px] border-white dark:border-surface-900">
+                            class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-[3px] border-white dark:border-surface-900 pointer-events-none">
                         </div>
                     </div>
 

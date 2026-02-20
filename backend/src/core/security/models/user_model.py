@@ -32,6 +32,7 @@ class UserModel(BaseModel):
     phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     password: Mapped[str] = mapped_column(String(128), nullable=False)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    avatar: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
     # Many-to-Many Relationship with RoleModel
     roles: Mapped[List["RoleModel"]] = relationship(back_populates="users", secondary=UserRoleLinkModel.__table__)
