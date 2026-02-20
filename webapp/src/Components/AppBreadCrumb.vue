@@ -3,7 +3,9 @@ import { computed } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { SideBarMenuItems } from '@/Constants';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChevronRight, faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faHouse } from '@fortawesome/free-regular-svg-icons';
+
 
 const page = usePage();
 

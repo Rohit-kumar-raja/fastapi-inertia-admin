@@ -346,29 +346,32 @@ onMounted(() => {
 
 <template>
     <AdminLayout>
-        <div class="flex flex-col gap-8">
+        <div class="flex flex-col gap-8 ">
 
             <!-- ═══════════ Welcome Banner ═══════════ -->
-            <div
-                class="relative overflow-hidden rounded-3xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 p-8 text-white shadow-xl">
-                <div class="absolute -top-10 -right-10 w-60 h-60 rounded-full bg-white/10 blur-3xl"></div>
-                <div class="absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-white/5 blur-3xl"></div>
-                <div class="relative z-10 flex items-center justify-between">
-                    <div>
-                        <p class="text-white/70 text-sm font-medium mb-1">Welcome back 👋</p>
-                        <h1 class="text-3xl font-extrabold tracking-tight">Admin Dashboard</h1>
-                        <p class="text-white/60 mt-2 text-sm max-w-md">Here's what's happening with your
-                            projects today. Monitor, analyze and optimize your performance.</p>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2 mb-2 p-5 bg-linear-to-r from-surface-0 to-surface-200 dark:from-surface-800 dark:to-surface-900">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <p class="text-sm font-medium text-slate-500 dark:text-surface-400">Welcome back 👋</p>
                     </div>
-                    <div class="hidden lg:flex items-center gap-3">
-                        <Button outlined class="border-white/30! text-white! hover:bg-white/10!" size="small">
-                            <template #icon><font-awesome-icon :icon="faArrowsRotate" /></template>
-                        </Button>
-                        <Button class="bg-white! text-indigo-700! border-0! font-semibold hover:bg-white/90!"
-                            size="small">
-                            <template #icon><font-awesome-icon :icon="faPlus" /></template>
-                        </Button>
-                    </div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-surface-50 tracking-tight">Admin
+                        Dashboard</h1>
+                    <p class="text-slate-500 dark:text-surface-400 text-sm mt-1 max-w-lg">Monitor, analyze, and optimize
+                        your project performance today.</p>
+                </div>
+
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <button
+                        class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-800 text-slate-600 dark:text-surface-300 hover:bg-slate-50 dark:hover:bg-surface-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 shadow-sm active:scale-95 group focus-visible:ring-2 focus-visible:ring-indigo-500/50 outline-none">
+                        <font-awesome-icon :icon="faArrowsRotate"
+                            class="text-[14px] group-hover:rotate-180 transition-transform duration-500" />
+                    </button>
+                    <button
+                        class="inline-flex items-center gap-2 px-4 py-2 sm:py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-all duration-300 shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 outline-none">
+                        <font-awesome-icon :icon="faPlus" class="text-[12px]" />
+                        <span>New Report</span>
+                    </button>
                 </div>
             </div>
 

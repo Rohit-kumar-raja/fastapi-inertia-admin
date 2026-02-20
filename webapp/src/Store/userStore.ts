@@ -18,9 +18,16 @@ export const useUserStore = defineStore('user', () => {
     initPermissions();
 
     function setUser(userData: any) {
+        try{
         user.value = userData;
         localStorage.setItem('user_data', JSON.stringify(userData));
         isAuthenticated.value = true;
+        }catch(error){
+            console.error('Failed to set user data:', error);
+            isAuthenticated.value = false;
+            user.value = null;
+            localStorage.removeItem('user_data');
+        }
     }
 
     async function fetchUser() {
@@ -38,7 +45,7 @@ export const useUserStore = defineStore('user', () => {
             localStorage.removeItem('user_data');
         }
     }
-    onMounted(setUser)
+    onMounted(fetchUser)
 
     async function login(credentials: any) {
         const response = await axios.post(admin.LOGIN_API, credentials, {
