@@ -27,3 +27,11 @@ class UserRestPasswordSchema(BaseSchema):
 
     password: str = Field(max_length=128, description="Hashed Password", min_length=8)
     confirm_password: str = Field(max_length=128, description="Hashed Password", min_length=8)
+
+
+class UserUpdateSchema(UserBaseSchema):
+    """
+    UserUpdateSchema is used to validate user update data.
+    """
+
+    role_ids: Optional[List[UUID]] = Field(default=[], description="List of Role UUIDs")

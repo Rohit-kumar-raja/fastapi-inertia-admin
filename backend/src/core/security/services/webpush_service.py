@@ -3,45 +3,32 @@ WebPushService — sends push notifications to subscribed browsers using VAPID.
 """
 import json
 import logging
-from typing import List, Optional
-from uuid import UUID
+from typing import List
 
 from pywebpush import webpush, WebPushException
-from sqlalchemy import select, delete
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models.push_subscription_model import PushSubscriptionModel
 from ...config.settings import settings
+from  ...common.uow.uow import AsyncUnitOfWork
+from ..repositories.webpush_repository import WebPushRepository
 
 logger = logging.getLogger(__name__)
 
 
 class WebPushService:
-    """Handles push subscription management and sending web push notifications."""
+    """Handles push subscription management and sending web push notifications via UoW."""
+    def __init__(self, uow: AsyncUnitOfWork[WebPushRepository]):
+        self.uow = uow
 
-    @staticmethod
-    async def subscribe(
-        user_id: str,
-        endpoint: str,
-        p256dh: str,
-        auth_key: str,
-        session: AsyncSession,
-    ) -> PushSubscriptionModel:
+    async def subscribe(self, user_id: str, endpoint: str, p256dh: str, auth_key: str) -> PushSubscriptionModel:
         """Save or update a push subscription for a user."""
-        # Check if this endpoint already exists
-        stmt = select(PushSubscriptionModel).where(
-            PushSubscriptionModel.endpoint == endpoint
-        )
-        result = await session.execute(stmt)
-        existing = result.scalar_one_or_none()
+        existing = await self.uow.repo.get_by_endpoint(endpoint)
 
         if existing:
-            # Update user_id and keys if the endpoint already exists
             existing.user_id = user_id
             existing.p256dh = p256dh
             existing.auth_key = auth_key
-            await session.commit()
-            await session.refresh(existing)
+            await self.uow.repo.update(existing)
             return existing
 
         sub = PushSubscriptionModel(
@@ -50,32 +37,17 @@ class WebPushService:
             p256dh=p256dh,
             auth_key=auth_key,
         )
-        session.add(sub)
-        await session.commit()
-        await session.refresh(sub)
+        await self.uow.repo.add(sub)
         return sub
 
-    @staticmethod
-    async def unsubscribe(endpoint: str, session: AsyncSession) -> bool:
+    async def unsubscribe(self, endpoint: str) -> bool:
         """Remove a push subscription by endpoint."""
-        stmt = delete(PushSubscriptionModel).where(
-            PushSubscriptionModel.endpoint == endpoint
-        )
-        result = await session.execute(stmt)
-        await session.commit()
-        return result.rowcount > 0
+        rowcount = await self.uow.repo.delete_by_endpoint(endpoint)
+        return rowcount > 0
 
-    @staticmethod
-    async def get_user_subscriptions(
-        user_id: str, session: AsyncSession
-    ) -> List[PushSubscriptionModel]:
+    async def get_user_subscriptions(self, user_id: str) -> List[PushSubscriptionModel]:
         """Get all push subscriptions for a user."""
-        stmt = select(PushSubscriptionModel).where(
-            PushSubscriptionModel.user_id == user_id,
-            PushSubscriptionModel.deleted_at.is_(None),
-        )
-        result = await session.execute(stmt)
-        return result.scalars().all()
+        return await self.uow.repo.get_user_subscriptions(user_id)
 
     @staticmethod
     def _send_push(subscription_info: dict, payload: dict) -> bool:
@@ -90,7 +62,6 @@ class WebPushService:
             return True
         except WebPushException as e:
             logger.warning(f"WebPush failed: {e}")
-            # If subscription is expired/invalid (410 Gone or 404), return False
             if hasattr(e, 'response') and e.response and e.response.status_code in (404, 410):
                 return False
             return False
@@ -98,18 +69,9 @@ class WebPushService:
             logger.error(f"WebPush unexpected error: {e}")
             return False
 
-    @staticmethod
-    async def send_to_user(
-        user_id: str,
-        title: str,
-        message: str,
-        notification_type: str,
-        session: AsyncSession,
-        url: str = "/admin/dashboard",
-    ) -> int:
-        """Send push notification to all of a user's subscribed browsers.
-        Returns the number of successful sends. Cleans up dead subscriptions."""
-        subs = await WebPushService.get_user_subscriptions(user_id, session)
+    async def send_to_user(self, user_id: str, title: str, message: str, notification_type: str, url: str = "/admin/dashboard") -> int:
+        """Send push notification to all of a user's subscribed browsers."""
+        subs = await self.get_user_subscriptions(user_id)
         if not subs:
             return 0
 
@@ -128,33 +90,21 @@ class WebPushService:
                 "endpoint": sub.endpoint,
                 "keys": {"p256dh": sub.p256dh, "auth": sub.auth_key},
             }
-            ok = WebPushService._send_push(subscription_info, payload)
+            ok = self._send_push(subscription_info, payload)
             if ok:
                 success_count += 1
             else:
                 dead_endpoints.append(sub.endpoint)
 
-        # Clean up dead subscriptions
         if dead_endpoints:
             for endpoint in dead_endpoints:
-                await WebPushService.unsubscribe(endpoint, session)
+                await self.unsubscribe(endpoint)
 
         return success_count
 
-    @staticmethod
-    async def broadcast(
-        title: str,
-        message: str,
-        notification_type: str,
-        session: AsyncSession,
-        url: str = "/admin/dashboard",
-    ) -> int:
-        """Send push notification to ALL subscribed browsers. Returns total successful sends."""
-        stmt = select(PushSubscriptionModel).where(
-            PushSubscriptionModel.deleted_at.is_(None)
-        )
-        result = await session.execute(stmt)
-        all_subs = result.scalars().all()
+    async def broadcast(self, title: str, message: str, notification_type: str, url: str = "/admin/dashboard") -> int:
+        """Send push notification to ALL subscribed browsers."""
+        all_subs = await self.uow.repo.get_all_active_subscriptions()
 
         if not all_subs:
             return 0
@@ -174,7 +124,7 @@ class WebPushService:
                 "endpoint": sub.endpoint,
                 "keys": {"p256dh": sub.p256dh, "auth": sub.auth_key},
             }
-            ok = WebPushService._send_push(subscription_info, payload)
+            ok = self._send_push(subscription_info, payload)
             if ok:
                 success_count += 1
             else:
@@ -182,6 +132,6 @@ class WebPushService:
 
         if dead_endpoints:
             for endpoint in dead_endpoints:
-                await WebPushService.unsubscribe(endpoint, session)
+                await self.unsubscribe(endpoint)
 
         return success_count

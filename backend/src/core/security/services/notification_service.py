@@ -1,86 +1,37 @@
-from typing import List, Optional
+from typing import List
 from uuid import UUID
 
-from sqlalchemy import select, update, func
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from ..models.notification_model import NotificationModel
+from  ...common.uow.uow import AsyncUnitOfWork
+from ..repositories.notification_repository import NotificationRepository
+from ..repositories.user_repository import UserRepository
 
 
 class NotificationService:
     """
-    NotificationService handles business logic for notifications.
+    NotificationService handles business logic for notifications using UoW.
     """
+    def __init__(self, uow: AsyncUnitOfWork[NotificationRepository]):
+        self.uow = uow
 
-    @staticmethod
-    async def get_user_notifications(
-        user_id: str, session: AsyncSession, limit: int = 20
-    ) -> List[NotificationModel]:
+    async def get_user_notifications(self, user_id: str, limit: int = 20) -> List[NotificationModel]:
         """Fetch recent notifications for a user, newest first."""
-        statement = (
-            select(NotificationModel)
-            .where(
-                NotificationModel.user_id == user_id,
-                NotificationModel.deleted_at.is_(None),
-            )
-            .order_by(NotificationModel.created_at.desc())
-            .limit(limit)
-        )
-        result = await session.execute(statement)
-        return result.scalars().all()
+        return await self.uow.repo.get_user_notifications(user_id, limit)
 
-    @staticmethod
-    async def get_unread_count(user_id: str, session: AsyncSession) -> int:
+    async def get_unread_count(self, user_id: str) -> int:
         """Get the count of unread notifications."""
-        statement = select(func.count(NotificationModel.id)).where(
-            NotificationModel.user_id == user_id,
-            NotificationModel.is_read == False,
-            NotificationModel.deleted_at.is_(None),
-        )
-        result = await session.execute(statement)
-        return result.scalar() or 0
+        return await self.uow.repo.get_unread_count(user_id)
 
-    @staticmethod
-    async def mark_as_read(
-        notification_id: UUID, user_id: str, session: AsyncSession
-    ) -> bool:
+    async def mark_as_read(self, notification_id: UUID, user_id: str) -> bool:
         """Mark a single notification as read."""
-        stmt = (
-            update(NotificationModel)
-            .where(
-                NotificationModel.id == notification_id,
-                NotificationModel.user_id == user_id,
-            )
-            .values(is_read=True)
-        )
-        result = await session.execute(stmt)
-        await session.commit()
-        return result.rowcount > 0
+        rowcount = await self.uow.repo.mark_as_read(notification_id, user_id)
+        return rowcount > 0
 
-    @staticmethod
-    async def mark_all_read(user_id: str, session: AsyncSession) -> int:
+    async def mark_all_read(self, user_id: str) -> int:
         """Mark all notifications as read for a user. Returns count updated."""
-        stmt = (
-            update(NotificationModel)
-            .where(
-                NotificationModel.user_id == user_id,
-                NotificationModel.is_read == False,
-                NotificationModel.deleted_at.is_(None),
-            )
-            .values(is_read=True)
-        )
-        result = await session.execute(stmt)
-        await session.commit()
-        return result.rowcount
+        return await self.uow.repo.mark_all_read(user_id)
 
-    @staticmethod
-    async def create_notification(
-        user_id: str,
-        title: str,
-        message: str,
-        type: str,
-        session: AsyncSession,
-    ) -> NotificationModel:
+    async def create_notification(self, user_id: str, title: str, message: str, type: str) -> NotificationModel:
         """Create a new notification."""
         notification = NotificationModel(
             user_id=user_id,
@@ -88,50 +39,23 @@ class NotificationService:
             message=message or "",
             type=type,
         )
-        session.add(notification)
-        await session.commit()
-        await session.refresh(notification)
+        await self.uow.repo.add(notification)
         return notification
 
-    @staticmethod
-    async def delete_notification(
-        notification_id: UUID, user_id: str, session: AsyncSession
-    ) -> bool:
+    async def delete_notification(self, notification_id: UUID, user_id: str) -> bool:
         """Delete (soft) a notification."""
-        from datetime import datetime
+        rowcount = await self.uow.repo.delete_notification(notification_id, user_id)
+        return rowcount > 0
 
-        stmt = (
-            update(NotificationModel)
-            .where(
-                NotificationModel.id == notification_id,
-                NotificationModel.user_id == user_id,
-            )
-            .values(deleted_at=datetime.utcnow())
-        )
-        result = await session.execute(stmt)
-        await session.commit()
-        return result.rowcount > 0
-
-    @staticmethod
-    async def create_for_all_users(
-        title: str,
-        message: str,
-        type: str,
-        session: AsyncSession,
-    ) -> int:
+    async def create_for_all_users(self, title: str, message: str, type: str) -> int:
         """Create a notification for all active users (broadcast)."""
-        from ..models.user_model import UserModel
-
-        result = await session.execute(
-            select(UserModel.id).where(UserModel.deleted_at.is_(None))
-        )
-        user_ids = result.scalars().all()
+        user_repo = self.uow.get_repo(UserRepository)
+        users = await user_repo.get_all_active_users()
         count = 0
-        for uid in user_ids:
+        for u in users:
             notification = NotificationModel(
-                user_id=uid, title=title, message=message or "", type=type
+                user_id=str(u.id), title=title, message=message or "", type=type
             )
-            session.add(notification)
+            self.uow.session.add(notification)
             count += 1
-        await session.commit()
         return count

@@ -1,13 +1,16 @@
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, status, Response
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from ..schemas.user_login_schema import UserLoginResponseSchema
 from ..schemas.base_schema import LoginResponseSchema
 from ..services.user_service import UserService
+from ..repositories.user_repository import UserRepository
+from ...dependencies.service_dependency import get_service
+
 from ..utils.hash import verify_password
 from ..utils.auth import create_access_token
 from ..utils import error_response, response
-from .. import get_db, InertiaDep
+from .. import InertiaDep
 
 auth_router = APIRouter(prefix="/login", tags=["auth"])
 
@@ -26,9 +29,9 @@ async def login_page(inertia: InertiaDep):
 async def login(
     responses: Response,
     login: OAuth2PasswordRequestForm = Depends(),
-    session: AsyncSession = Depends(get_db),
+    user_service: UserService = Depends(get_service(UserService, UserRepository)),
 ):
-    user_data = await UserService.get_user_by_username(login.username, session=session)
+    user_data = await user_service.get_user_by_username(login.username)
     if not user_data:
         return error_response(message="User not found", status_code=status.HTTP_404_NOT_FOUND)
     if not user_data.is_active:
@@ -38,13 +41,11 @@ async def login(
 
     token = create_access_token(user_data)
 
-    # Fetch user permissions
     permissions = []
     if user_data.is_superuser:
-        # SuperAdmin gets a special marker — frontend treats this as "all permissions"
         permissions = ["*"]
     else:
-        permissions = await UserService.get_user_permissions(user_data.id, session=session)
+        permissions = await user_service.get_user_permissions(user_data.id)
 
     data = {"user": user_data.__dict__}
     data["access_token"] = token
@@ -58,11 +59,11 @@ async def login(
     return response_data
 
 
-@auth_router.post("/reset-password", name="admin.user.reset-password")
-async def reset_password(self):
+@auth_router.post("/reset-password", name="auth.reset-password")
+async def reset_password():
     pass
 
 
-@auth_router.post("/forgot-password", name="admin.user.forgot-password")
-async def forgot_password(self):
+@auth_router.post("/forgot-password", name="auth.forgot-password")
+async def forgot_password():
     pass
