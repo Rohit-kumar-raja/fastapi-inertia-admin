@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
+ENV PYTHONPATH=/app/backend/src
+
 # Copy only dependency files first (for caching)
 # Copy entire application (backend + frontend)
 COPY . .
