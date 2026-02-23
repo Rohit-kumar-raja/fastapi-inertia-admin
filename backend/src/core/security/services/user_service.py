@@ -1,5 +1,4 @@
-import time
-from typing import Dict, List, Optional, Set
+from typing import List, Optional
 from sqlalchemy import delete, select, update
 from uuid import UUID
 from datetime import datetime
@@ -10,16 +9,17 @@ from ..models.role_model import RoleModel, RolePermissionLinkModel
 from ..models.user_model import UserModel, UserRoleLinkModel
 from ..utils.hash import make_password
 from datatables import DataTables, DataTablesRequest
-from  core.common.uow.uow import AsyncUnitOfWork
+from core.common.uow.uow import AsyncUnitOfWork
 from ..repositories.user_repository import UserRepository
 from ..repositories.role_repository import RoleRepository
 
 
 class UserService:
     """
-    UserService handles the business logic and database operations for User 
+    UserService handles the business logic and database operations for User
     with UoW and Repositories injected.
     """
+
     def __init__(self, uow: AsyncUnitOfWork[UserRepository]):
         self.uow = uow
 
@@ -49,14 +49,20 @@ class UserService:
         """Update an existing User."""
         data.pop("id", None)
         role_ids = data.pop("role_ids", [])
-        
-        # We perform the relationship link deletes manually here or we could put this in the repo 
-        await self.uow.session.execute(delete(UserRoleLinkModel).where(UserRoleLinkModel.auth_user_id == uuid))
-        for role_id in role_ids:
-            self.uow.session.add(UserRoleLinkModel(auth_user_id=uuid, auth_role_id=role_id))
-            
+
+        # We perform the relationship link deletes manually here or we could put this in the repo
         await self.uow.session.execute(
-            update(UserModel).where(UserModel.id == uuid, UserModel.deleted_at.is_(None)).values(**data)
+            delete(UserRoleLinkModel).where(UserRoleLinkModel.security_user_id == uuid)
+        )
+        for role_id in role_ids:
+            self.uow.session.add(
+                UserRoleLinkModel(security_user_id=uuid, security_role_id=role_id)
+            )
+
+        await self.uow.session.execute(
+            update(UserModel)
+            .where(UserModel.id == uuid, UserModel.deleted_at.is_(None))
+            .values(**data)
         )
         return await self.get_by_id(uuid)
 
@@ -73,10 +79,12 @@ class UserService:
         """Check if username or email already exists."""
         if username:
             user = await self.uow.repo.get_by_username(username)
-            if user: return True
+            if user:
+                return True
         if email:
             user = await self.uow.repo.get_by_email(email)
-            if user: return True
+            if user:
+                return True
         return False
 
     async def get_user_by_username(self, username: str) -> Optional[UserModel]:
@@ -85,7 +93,9 @@ class UserService:
     async def reset_password(self, uuid: UUID) -> Optional[dict]:
         default_password = make_password("password123")
         await self.uow.session.execute(
-            update(UserModel).where(UserModel.id == uuid, UserModel.deleted_at.is_(None)).values(password=default_password)
+            update(UserModel)
+            .where(UserModel.id == uuid, UserModel.deleted_at.is_(None))
+            .values(password=default_password)
         )
         return await self.get_by_id(uuid)
 
@@ -95,11 +105,14 @@ class UserService:
         """
         statement = (
             select(PermissionModel.name)
-            .join(RolePermissionLinkModel, RolePermissionLinkModel.auth_permission_id == PermissionModel.id)
-            .join(RoleModel, RoleModel.id == RolePermissionLinkModel.auth_role_id)
-            .join(UserRoleLinkModel, UserRoleLinkModel.auth_role_id == RoleModel.id)
+            .join(
+                RolePermissionLinkModel,
+                RolePermissionLinkModel.security_permission_id == PermissionModel.id,
+            )
+            .join(RoleModel, RoleModel.id == RolePermissionLinkModel.security_role_id)
+            .join(UserRoleLinkModel, UserRoleLinkModel.security_role_id == RoleModel.id)
             .where(
-                UserRoleLinkModel.auth_user_id == user_id,
+                UserRoleLinkModel.security_user_id == user_id,
                 RoleModel.deleted_at.is_(None),
                 PermissionModel.deleted_at.is_(None),
                 PermissionModel.is_active.is_(True),
@@ -113,6 +126,10 @@ class UserService:
 
     async def datatables(self, request_data: DataTablesRequest) -> List[UserModel]:
         """Fetch all active and non-deleted Users."""
-        statement = select(UserModel).filter_by(deleted_at=None, is_active=True).options(selectinload(UserModel.roles))
+        statement = (
+            select(UserModel)
+            .filter_by(deleted_at=None, is_active=True)
+            .options(selectinload(UserModel.roles))
+        )
         datatables = DataTables(self.uow.session, UserModel, statement)
         return await datatables.process(request_data=request_data)

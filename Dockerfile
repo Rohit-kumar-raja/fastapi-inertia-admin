@@ -30,6 +30,6 @@ EXPOSE 8000 5173
 # Default command for development mode
 # Runs both backend (Uvicorn reload) & frontend (npm run dev)
 CMD ["bash", "-c", "\
-    cd backend && uvicorn main:app --host 0.0.0.0 --port 8000 --reload & \
+    cd backend && uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload & \
     cd webapp && npm install && npm run dev -- --host 0.0.0.0 \
 "]

@@ -10,7 +10,7 @@ class NotificationModel(BaseModel):
     NotificationModel represents admin notifications.
     """
 
-    __tablename__ = "auth_notification"
+    __tablename__ = "security_notification"
 
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

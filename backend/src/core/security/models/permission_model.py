@@ -13,7 +13,7 @@ class PermissionModel(BaseModel):
     Permissions are auto-synced from FastAPI route names (e.g. 'admin.role.read').
     """
 
-    __tablename__ = "auth_permission"
+    __tablename__ = "security_permission"
 
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     module: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
@@ -21,5 +21,5 @@ class PermissionModel(BaseModel):
 
     # Many-to-Many Relationship with RoleModel
     roles: Mapped[List["RoleModel"]] = relationship(
-        back_populates="permissions", secondary="auth_role_permission", viewonly=True
+        back_populates="permissions", secondary="security_role_permission", viewonly=True
     )

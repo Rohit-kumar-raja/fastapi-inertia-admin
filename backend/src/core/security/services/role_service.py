@@ -46,10 +46,10 @@ class RoleService:
         if "permission_ids" in data:
             permission_ids = data.pop("permission_ids")
             await self.uow.session.execute(
-                delete(RolePermissionLinkModel).where(RolePermissionLinkModel.auth_role_id == uuid)
+                delete(RolePermissionLinkModel).where(RolePermissionLinkModel.security_role_id == uuid)
             )
             for permission_id in permission_ids:
-                self.uow.session.add(RolePermissionLinkModel(auth_permission_id=permission_id, auth_role_id=uuid))
+                self.uow.session.add(RolePermissionLinkModel(security_permission_id=permission_id, security_role_id=uuid))
         
         await self.uow.session.execute(
             update(RoleModel).where(RoleModel.id == uuid, RoleModel.deleted_at.is_(None)).values(**data)

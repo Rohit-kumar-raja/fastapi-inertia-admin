@@ -1,9 +1,13 @@
-from ..services.role_service import RoleService
-from ..services.user_service import UserService
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import delete
+
+from core.common.uow.uow import AsyncUnitOfWork
 from core.security.models.user_model import UserModel
+from core.security.repositories.user_repository import UserRepository
+from core.security.repositories.role_repository import RoleRepository
+from core.security.services.user_service import UserService
+from core.security.services.role_service import RoleService
 
 
 class UserSeeder:
@@ -16,7 +20,6 @@ class UserSeeder:
         """
         Run the seeder to insert sample data into the database.
         """
-        # Sample data to be inserted into the database
         records = [
             {
                 "username": "admin",
@@ -26,15 +29,18 @@ class UserSeeder:
                 "is_active": True,
                 "password": "Admin@1234",  # Replace with actual hashed password
             },
-          
-            
         ]
 
-        # Insert the data into the database using a loop
-        for record in records:
-            role_services = await RoleService.get_all(session=session)
-            record["role_ids"] = [role.id for role in role_services]
-            await UserService.create(record, session=session)
+        async with AsyncUnitOfWork(session, RoleRepository) as role_uow:
+            role_service = RoleService(role_uow)
+            roles = await role_service.get_all()
+
+        async with AsyncUnitOfWork(session, UserRepository) as user_uow:
+            user_service = UserService(user_uow)
+            for record in records:
+                # Add role IDs to the user record
+                record["role_ids"] = [str(role.id) for role in roles]
+                await user_service.create(record)
 
     @staticmethod
     async def delete_all(session: AsyncSession):

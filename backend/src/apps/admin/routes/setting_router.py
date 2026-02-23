@@ -10,7 +10,7 @@ from ..schemas.setting_schema import (
     AppSettingBulkSchema,
 )
 from ..services.setting_service import SettingService
-from ....core.security.utils import response, error_response
+from core.security.utils import response, error_response
 
 setting_router = APIRouter(dependencies=[Depends(web_auth)])
 

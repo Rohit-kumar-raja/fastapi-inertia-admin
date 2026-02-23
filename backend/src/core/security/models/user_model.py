@@ -13,19 +13,19 @@ class UserRoleLinkModel(BaseModel):
     Association table for the Many-to-Many relationship between User and Role.
     """
 
-    __tablename__ = "auth_user_roles"
+    __tablename__ = "security_user_roles"
 
-    auth_user_id: Mapped[str] = mapped_column(ForeignKey("auth_user.id"), primary_key=True)
-    auth_role_id: Mapped[str] = mapped_column(ForeignKey("auth_role.id"), primary_key=True)
+    security_user_id: Mapped[str] = mapped_column(ForeignKey("security_user.id"), primary_key=True)
+    security_role_id: Mapped[str] = mapped_column(ForeignKey("security_role.id"), primary_key=True)
 
 
 
 class UserModel(BaseModel):
     """
-    UserModel represents the schema for auth_user.
+    UserModel represents the schema for security_user.
     """
 
-    __tablename__ = "auth_user"
+    __tablename__ = "security_user"
 
     username: Mapped[str] = mapped_column(String(150), nullable=False, unique=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)

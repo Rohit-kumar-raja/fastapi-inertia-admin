@@ -1,6 +1,6 @@
 from pydantic import Field, EmailStr
 from typing import Optional, List, Dict
-from ....core.common.schemas import BaseSchema
+from core.common.schemas import BaseSchema
 
 
 class ProfileUpdateSchema(BaseSchema):

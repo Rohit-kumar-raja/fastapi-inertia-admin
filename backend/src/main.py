@@ -9,11 +9,11 @@ from inertia import (
     inertia_request_validation_exception_handler,
     InertiaVersionConflictException,
 )
-from src.core.config.inertia import inertia_config
-from src.apps.admin.routes import admin_router
-from src.core.security.routers import security_router
+from core.config.inertia import inertia_config
+from apps.admin.routes import admin_router
+from core.security.routers import security_router
 
-from src.core.middlewares.rbac_middleware import RBACMiddleware
+from core.middlewares.rbac_middleware import RBACMiddleware
 
 
 app = FastAPI()
@@ -47,9 +47,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 vue_dir = (
-    os.path.join(os.path.dirname(__file__), "..", "webapp", "dist")
+    os.path.join(os.path.dirname(__file__), "..", "..", "webapp", "dist")
     if inertia_config.environment != "development"
-    else os.path.join(os.path.dirname(__file__), "..", "webapp", "src")
+    else os.path.join(os.path.dirname(__file__), "..", "..", "webapp", "src")
 )
 
 app.mount("/src", StaticFiles(directory=vue_dir), name="src")
@@ -65,12 +65,14 @@ app.include_router(security_router)
 @app.on_event("startup")
 async def startup_sync_permissions():
     """Auto-sync permissions from all registered FastAPI routes on server start."""
-    from src.core.security.services.permission_service import PermissionService
-    from src.core.config.database import AsyncSessionLocal
+    from core.security.services.permission_service import PermissionService
+    from core.config.database import AsyncSessionLocal
 
     async with AsyncSessionLocal() as session:
         try:
             result = await PermissionService.sync_permissions(app, session=session)
-            print(f"✅ Permissions auto-synced: created={result['created']}, total_routes={result['total_routes']}")
+            print(
+                f"✅ Permissions auto-synced: created={result['created']}, total_routes={result['total_routes']}"
+            )
         except Exception as e:
             print(f"⚠️ Permission sync failed (non-fatal): {e}")

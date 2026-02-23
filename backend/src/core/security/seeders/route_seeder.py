@@ -1,9 +1,12 @@
-from ..models.permission_model import PermissionModel
-from ..models.role_model import RolePermissionLinkModel
-from ..services.permission_service import PermissionService
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import delete
+
+from core.common.uow.uow import AsyncUnitOfWork
+from core.security.models.permission_model import PermissionModel
+from core.security.models.role_model import RolePermissionLinkModel
+from core.security.repositories.permission_repository import PermissionRepository
+from core.security.services.permission_service import PermissionService
 
 
 class PermissionSeeder:
@@ -19,7 +22,10 @@ class PermissionSeeder:
         """
         from main import app
 
-        result = await PermissionService.sync_permissions(app, session=session)
+        async with AsyncUnitOfWork(session, PermissionRepository) as perm_uow:
+            perm_service = PermissionService(perm_uow)
+            result = await perm_service.sync_permissions(app)
+            
         print(f"✅ Permissions synced: {result}")
 
     @staticmethod

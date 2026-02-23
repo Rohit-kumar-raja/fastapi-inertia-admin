@@ -10,7 +10,7 @@ class PushSubscriptionModel(BaseModel):
     Each subscription corresponds to one browser on one device for one user.
     """
 
-    __tablename__ = "auth_push_subscription"
+    __tablename__ = "security_push_subscription"
 
     user_id: Mapped[str] = mapped_column(UUID(as_uuid=True), nullable=False)
     endpoint: Mapped[str] = mapped_column(Text, nullable=False, unique=True)

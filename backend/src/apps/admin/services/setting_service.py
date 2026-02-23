@@ -3,8 +3,8 @@ from uuid import UUID
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ....core.security.models.user_model import UserModel
-from ....core.security.utils.hash import verify_password, make_password
+from core.security.models.user_model import UserModel
+from core.security.utils.hash import verify_password, make_password
 from ..models.company_info_model import CompanyInfoModel
 from ..models.app_setting_model import AppSettingModel
 
