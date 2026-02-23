@@ -11,7 +11,7 @@ class RoleRepository(BaseRepository[RoleModel]):
         super().__init__(session, RoleModel)
 
     async def get_by_name(self, name: str) -> Optional[RoleModel]:
-        statement = select(RoleModel).where(RoleModel.name == name, RoleModel.deleted_at.is_(None))
+        statement = select(RoleModel).where(RoleModel.name == name)
         result = await self.session.execute(statement)
         return result.scalars().first()
 
@@ -21,14 +21,14 @@ class RoleRepository(BaseRepository[RoleModel]):
         return result.unique().scalars().all()
 
     async def get_all_with_permissions(self) -> List[RoleModel]:
-        statement = select(RoleModel).where(RoleModel.deleted_at.is_(None)).options(selectinload(RoleModel.permissions))
+        statement = select(RoleModel).options(selectinload(RoleModel.permissions))
         result = await self.session.execute(statement)
         return result.scalars().all()
 
     async def get_by_id_with_permissions(self, uuid: str) -> Optional[RoleModel]:
         statement = (
             select(RoleModel)
-            .where(RoleModel.id == uuid, RoleModel.deleted_at.is_(None))
+            .where(RoleModel.id == uuid)
             .options(selectinload(RoleModel.permissions))
         )
         result = await self.session.execute(statement)

@@ -34,8 +34,7 @@ class PermissionService:
     async def get_by_name(self, name: str) -> Optional[PermissionModel]:
         """Fetch a Permission by its name."""
         statement = select(PermissionModel).where(
-            PermissionModel.name == name,
-            PermissionModel.deleted_at.is_(None),
+            PermissionModel.name == name
         )
         result = await self.uow.session.execute(statement)
         return result.scalars().first()
@@ -46,8 +45,7 @@ class PermissionService:
         await self.uow.session.execute(
             update(PermissionModel)
             .where(
-                PermissionModel.id == uuid,
-                PermissionModel.deleted_at.is_(None),
+                PermissionModel.id == uuid
             )
             .values(**data)
         )
@@ -56,7 +54,7 @@ class PermissionService:
     async def delete(self, uuid: UUID) -> bool:
         """Soft delete a Permission by its UUID."""
         instance = await self.uow.repo.get_by_id(str(uuid))
-        if instance and instance.deleted_at is None:
+        if instance:
             instance.deleted_at = datetime.utcnow()
             await self.uow.repo.update(instance)
             return True

@@ -61,7 +61,7 @@ class UserService:
 
         await self.uow.session.execute(
             update(UserModel)
-            .where(UserModel.id == uuid, UserModel.deleted_at.is_(None))
+            .where(UserModel.id == uuid)
             .values(**data)
         )
         return await self.get_by_id(uuid)
@@ -69,7 +69,7 @@ class UserService:
     async def delete(self, uuid: UUID) -> bool:
         """Soft delete a User by its UUID."""
         instance = await self.uow.repo.get_by_id(uuid)
-        if instance and instance.deleted_at is None:
+        if instance:
             instance.deleted_at = datetime.utcnow()
             await self.uow.repo.update(instance)
             return True
@@ -94,7 +94,7 @@ class UserService:
         default_password = make_password("password123")
         await self.uow.session.execute(
             update(UserModel)
-            .where(UserModel.id == uuid, UserModel.deleted_at.is_(None))
+            .where(UserModel.id == uuid)
             .values(password=default_password)
         )
         return await self.get_by_id(uuid)
@@ -113,8 +113,6 @@ class UserService:
             .join(UserRoleLinkModel, UserRoleLinkModel.security_role_id == RoleModel.id)
             .where(
                 UserRoleLinkModel.security_user_id == user_id,
-                RoleModel.deleted_at.is_(None),
-                PermissionModel.deleted_at.is_(None),
                 PermissionModel.is_active.is_(True),
             )
             .distinct()
@@ -128,7 +126,7 @@ class UserService:
         """Fetch all active and non-deleted Users."""
         statement = (
             select(UserModel)
-            .filter_by(deleted_at=None, is_active=True)
+            .filter_by(is_active=True)
             .options(selectinload(UserModel.roles))
         )
         datatables = DataTables(self.uow.session, UserModel, statement)

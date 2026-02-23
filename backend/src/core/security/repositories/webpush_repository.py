@@ -22,13 +22,12 @@ class WebPushRepository(BaseRepository[PushSubscriptionModel]):
 
     async def get_user_subscriptions(self, user_id: str) -> List[PushSubscriptionModel]:
         stmt = select(PushSubscriptionModel).where(
-            PushSubscriptionModel.user_id == user_id,
-            PushSubscriptionModel.deleted_at.is_(None),
+            PushSubscriptionModel.user_id == user_id
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
     async def get_all_active_subscriptions(self) -> List[PushSubscriptionModel]:
-        stmt = select(PushSubscriptionModel).where(PushSubscriptionModel.deleted_at.is_(None))
+        stmt = select(PushSubscriptionModel)
         result = await self.session.execute(stmt)
         return result.scalars().all()

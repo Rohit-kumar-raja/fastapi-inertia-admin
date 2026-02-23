@@ -11,24 +11,24 @@ class UserRepository(BaseRepository[UserModel]):
         super().__init__(session, UserModel)
 
     async def get_by_username(self, username: str) -> Optional[UserModel]:
-        statement = select(UserModel).where(UserModel.username == username, UserModel.deleted_at.is_(None))
+        statement = select(UserModel).where(UserModel.username == username)
         result = await self.session.execute(statement)
         return result.scalars().first()
 
     async def get_by_email(self, email: str) -> Optional[UserModel]:
-        statement = select(UserModel).where(UserModel.email == email, UserModel.deleted_at.is_(None))
+        statement = select(UserModel).where(UserModel.email == email)
         result = await self.session.execute(statement)
         return result.scalars().first()
 
     async def get_all_active_users(self) -> List[UserModel]:
-        statement = select(UserModel).where(UserModel.deleted_at.is_(None)).options(selectinload(UserModel.roles))
+        statement = select(UserModel).options(selectinload(UserModel.roles))
         result = await self.session.execute(statement)
         return result.scalars().all()
 
     async def get_by_id_with_roles(self, uuid: str) -> Optional[UserModel]:
         statement = (
             select(UserModel)
-            .where(UserModel.id == uuid, UserModel.deleted_at.is_(None))
+            .where(UserModel.id == uuid)
             .options(selectinload(UserModel.roles))
         )
         result = await self.session.execute(statement)

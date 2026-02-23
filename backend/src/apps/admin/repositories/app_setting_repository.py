@@ -10,7 +10,7 @@ class AppSettingRepository(BaseRepository[AppSettingModel]):
         super().__init__(session, AppSettingModel)
 
     async def get_all_settings(self, group: Optional[str] = None) -> List[AppSettingModel]:
-        stmt = select(AppSettingModel).where(AppSettingModel.deleted_at.is_(None))
+        stmt = select(AppSettingModel)
         if group:
             stmt = stmt.where(AppSettingModel.group == group)
         stmt = stmt.order_by(AppSettingModel.group, AppSettingModel.key)
@@ -20,8 +20,7 @@ class AppSettingRepository(BaseRepository[AppSettingModel]):
     async def get_by_key(self, key: str) -> Optional[AppSettingModel]:
         result = await self.session.execute(
             select(AppSettingModel).where(
-                AppSettingModel.key == key,
-                AppSettingModel.deleted_at.is_(None),
+                AppSettingModel.key == key
             )
         )
         return result.scalars().first()

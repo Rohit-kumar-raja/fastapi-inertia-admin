@@ -22,7 +22,7 @@ class BaseService(Generic[T]):
         return result.scalar_one()
 
     async def get_all(self, session: AsyncSession) -> List[T]:
-        result = await session.execute(select(self.model).where(self.model.deleted_at.is_(None)))
+        result = await session.execute(select(self.model))
         return result.scalars().all()
 
     async def get_by_id(self, session: AsyncSession, obj_id: UUID) -> Optional[T]:
@@ -37,13 +37,13 @@ class BaseService(Generic[T]):
 
     async def soft_delete(self, session: AsyncSession, obj_id: UUID) -> bool:
         instance = await session.get(self.model, obj_id)
-        if instance and instance.deleted_at is None:
+        if instance:
             instance.deleted_at = datetime.now()
             await session.commit()
             return True
         return False
 
     async def datatables(self, session: AsyncSession, request_data: DataTablesRequest) -> Optional[T]:
-        statement = select(self.model).filter_by(deleted_at=None)
+        statement = select(self.model)
         datatables = DataTables(session, self.model, statement)
         return await datatables.process(request_data=request_data)

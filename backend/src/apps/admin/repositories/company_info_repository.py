@@ -11,6 +11,6 @@ class CompanyInfoRepository(BaseRepository[CompanyInfoModel]):
 
     async def get_company_info(self) -> Optional[CompanyInfoModel]:
         result = await self.session.execute(
-            select(CompanyInfoModel).where(CompanyInfoModel.deleted_at.is_(None)).limit(1)
+            select(CompanyInfoModel).limit(1)
         )
         return result.scalars().first()

@@ -52,14 +52,14 @@ class RoleService:
                 self.uow.session.add(RolePermissionLinkModel(security_permission_id=permission_id, security_role_id=uuid))
         
         await self.uow.session.execute(
-            update(RoleModel).where(RoleModel.id == uuid, RoleModel.deleted_at.is_(None)).values(**data)
+            update(RoleModel).where(RoleModel.id == uuid).values(**data)
         )
         return await self.get_by_id(uuid)
 
     async def delete(self, uuid: UUID) -> bool:
         """Soft delete a Role if it is active and not already deleted."""
         instance = await self.uow.repo.get_by_id(uuid)
-        if instance and instance.deleted_at is None:
+        if instance:
             instance.deleted_at = datetime.utcnow()
             await self.uow.repo.update(instance)
             return True
@@ -73,7 +73,7 @@ class RoleService:
         """Fetch all active and non-deleted Roles."""
         statement = (
             select(RoleModel)
-            .filter_by(deleted_at=None, is_active=True)
+            .filter_by(is_active=True)
             .options(selectinload(RoleModel.permissions))
         )
         datatables = DataTables(self.uow.session, RoleModel, statement)

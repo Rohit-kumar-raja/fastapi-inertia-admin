@@ -15,6 +15,6 @@ class PermissionRepository(BaseRepository[PermissionModel]):
         return result.unique().scalars().all()
 
     async def get_all_active(self) -> List[PermissionModel]:
-        statement = select(PermissionModel).where(PermissionModel.deleted_at.is_(None))
+        statement = select(PermissionModel)
         result = await self.session.execute(statement)
         return result.scalars().all()

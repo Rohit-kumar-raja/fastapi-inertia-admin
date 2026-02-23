@@ -15,8 +15,7 @@ class NotificationRepository(BaseRepository[NotificationModel]):
         statement = (
             select(NotificationModel)
             .where(
-                NotificationModel.user_id == user_id,
-                NotificationModel.deleted_at.is_(None),
+                NotificationModel.user_id == user_id
             )
             .order_by(NotificationModel.created_at.desc())
             .limit(limit)
@@ -27,8 +26,7 @@ class NotificationRepository(BaseRepository[NotificationModel]):
     async def get_unread_count(self, user_id: str) -> int:
         statement = select(func.count(NotificationModel.id)).where(
             NotificationModel.user_id == user_id,
-            NotificationModel.is_read == False,
-            NotificationModel.deleted_at.is_(None),
+            NotificationModel.is_read == False
         )
         result = await self.session.execute(statement)
         return result.scalar() or 0
@@ -51,8 +49,7 @@ class NotificationRepository(BaseRepository[NotificationModel]):
             update(NotificationModel)
             .where(
                 NotificationModel.user_id == user_id,
-                NotificationModel.is_read == False,
-                NotificationModel.deleted_at.is_(None),
+                NotificationModel.is_read == False
             )
             .values(is_read=True)
         )
@@ -70,5 +67,6 @@ class NotificationRepository(BaseRepository[NotificationModel]):
             .values(deleted_at=datetime.utcnow())
         )
         result = await self.session.execute(stmt)
+        
         await self.session.flush()
         return result.rowcount
