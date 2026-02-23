@@ -55,8 +55,7 @@ class PermissionService:
         """Soft delete a Permission by its UUID."""
         instance = await self.uow.repo.get_by_id(str(uuid))
         if instance:
-            instance.deleted_at = datetime.utcnow()
-            await self.uow.repo.update(instance)
+            await self.uow.repo.delete(instance)
             return True
         return False
 

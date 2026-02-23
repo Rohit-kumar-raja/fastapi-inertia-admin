@@ -59,14 +59,17 @@ class NotificationRepository(BaseRepository[NotificationModel]):
 
     async def delete_notification(self, notification_id: UUID, user_id: str) -> int:
         stmt = (
-            update(NotificationModel)
+            select(NotificationModel)
             .where(
                 NotificationModel.id == notification_id,
                 NotificationModel.user_id == user_id,
             )
-            .values(deleted_at=datetime.utcnow())
         )
         result = await self.session.execute(stmt)
+        instance = result.scalars().first()
         
-        await self.session.flush()
-        return result.rowcount
+        if instance:
+            await self.session.delete(instance)
+            await self.session.flush()
+            return 1
+        return 0

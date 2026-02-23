@@ -38,7 +38,7 @@ class BaseService(Generic[T]):
     async def soft_delete(self, session: AsyncSession, obj_id: UUID) -> bool:
         instance = await session.get(self.model, obj_id)
         if instance:
-            instance.deleted_at = datetime.now()
+            await session.delete(instance)
             await session.commit()
             return True
         return False

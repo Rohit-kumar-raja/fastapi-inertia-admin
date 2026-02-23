@@ -60,8 +60,7 @@ class RoleService:
         """Soft delete a Role if it is active and not already deleted."""
         instance = await self.uow.repo.get_by_id(uuid)
         if instance:
-            instance.deleted_at = datetime.utcnow()
-            await self.uow.repo.update(instance)
+            await self.uow.repo.delete(instance)
             return True
         return False
 

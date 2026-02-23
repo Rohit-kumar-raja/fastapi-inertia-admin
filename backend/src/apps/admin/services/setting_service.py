@@ -168,7 +168,6 @@ class SettingService:
         """Delete a setting by key (soft delete)."""
         setting = await self.uow.repo.get_by_key(key)
         if setting:
-            setting.deleted_at = datetime.utcnow()
-            await self.uow.repo.update(setting)
+            await self.uow.repo.delete(setting)
             return True
         return False
