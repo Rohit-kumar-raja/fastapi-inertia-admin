@@ -1,7 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, Request
-from sqlalchemy.ext.asyncio import AsyncSession
-from .. import InertiaDep, web_auth, get_db
+from .. import InertiaDep, web_auth
 from ..schemas.setting_schema import (
     ProfileUpdateSchema,
     PasswordChangeSchema,
@@ -10,6 +9,8 @@ from ..schemas.setting_schema import (
     AppSettingBulkSchema,
 )
 from ..services.setting_service import SettingService
+from ..repositories.app_setting_repository import AppSettingRepository
+from core.dependencies.service_dependency import get_service
 from core.security.utils import response, error_response
 
 setting_router = APIRouter(dependencies=[Depends(web_auth)])
@@ -18,12 +19,16 @@ setting_router = APIRouter(dependencies=[Depends(web_auth)])
 # ─── Page Render ─────────────────────────────────────────────
 
 @setting_router.get("/settings")
-async def settings(request: Request, inertia: InertiaDep, session: AsyncSession = Depends(get_db)):
+async def settings(
+    request: Request, 
+    inertia: InertiaDep, 
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
+):
     """Render the settings page with user + company data."""
     current_user = request.state.user
-    user_data = await SettingService.get_user_profile(current_user["id"], session)
-    company_data = await SettingService.get_company_info(session)
-    app_settings = await SettingService.get_all_settings(session)
+    user_data = await setting_service.get_user_profile(current_user["id"])
+    company_data = await setting_service.get_company_info()
+    app_settings = await setting_service.get_all_settings()
     return await inertia.render("Admin/Settings/Index", {
         "user": user_data,
         "company": company_data,
@@ -36,11 +41,11 @@ async def settings(request: Request, inertia: InertiaDep, session: AsyncSession 
 @setting_router.get("/settings/profile")
 async def get_profile(
     request: Request,
-    session: AsyncSession = Depends(get_db),
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
 ):
     """Get current user's profile."""
     current_user = request.state.user
-    user_data = await SettingService.get_user_profile(current_user["id"], session)
+    user_data = await setting_service.get_user_profile(current_user["id"])
     if not user_data:
         return error_response(message="User not found", status_code=404)
     return response(data=user_data, message="Profile fetched successfully")
@@ -50,12 +55,12 @@ async def get_profile(
 async def update_profile(
     data: ProfileUpdateSchema,
     request: Request,
-    session: AsyncSession = Depends(get_db),
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
 ):
     """Update current user's profile."""
     current_user = request.state.user
-    result = await SettingService.update_profile(
-        current_user["id"], data.model_dump(exclude_none=True), session
+    result = await setting_service.update_profile(
+        current_user["id"], data.model_dump(exclude_none=True)
     )
     if result and "error" in result:
         return error_response(message=result["error"], status_code=422)
@@ -66,18 +71,17 @@ async def update_profile(
 async def change_password(
     data: PasswordChangeSchema,
     request: Request,
-    session: AsyncSession = Depends(get_db),
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
 ):
     """Change current user's password."""
     if data.new_password != data.confirm_password:
         return error_response(message="Passwords do not match", status_code=422)
 
     current_user = request.state.user
-    result = await SettingService.change_password(
+    result = await setting_service.change_password(
         current_user["id"],
         data.current_password,
         data.new_password,
-        session,
     )
     if "error" in result:
         return error_response(message=result["error"], status_code=422)
@@ -87,19 +91,21 @@ async def change_password(
 # ─── Company Info ────────────────────────────────────────────
 
 @setting_router.get("/settings/company")
-async def get_company_info(session: AsyncSession = Depends(get_db)):
+async def get_company_info(
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
+):
     """Fetch company info."""
-    data = await SettingService.get_company_info(session)
+    data = await setting_service.get_company_info()
     return response(data=data, message="Company info fetched successfully")
 
 
 @setting_router.put("/settings/company")
 async def update_company_info(
     data: CompanyInfoSchema,
-    session: AsyncSession = Depends(get_db),
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
 ):
     """Create or update company info."""
-    result = await SettingService.upsert_company_info(data.model_dump(), session)
+    result = await setting_service.upsert_company_info(data.model_dump())
     return response(data=result, message="Company info updated successfully")
 
 
@@ -108,17 +114,20 @@ async def update_company_info(
 @setting_router.get("/settings/app")
 async def get_app_settings(
     group: Optional[str] = None,
-    session: AsyncSession = Depends(get_db),
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
 ):
     """Fetch all app settings, optionally filtered by group."""
-    data = await SettingService.get_all_settings(session, group=group)
+    data = await setting_service.get_all_settings(group=group)
     return response(data=data, message="Settings fetched successfully")
 
 
 @setting_router.get("/settings/app/{key}")
-async def get_app_setting(key: str, session: AsyncSession = Depends(get_db)):
+async def get_app_setting(
+    key: str, 
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
+):
     """Fetch a single app setting by key."""
-    data = await SettingService.get_setting(key, session)
+    data = await setting_service.get_setting(key)
     if not data:
         return error_response(message="Setting not found", status_code=404)
     return response(data=data, message="Setting fetched successfully")
@@ -127,28 +136,31 @@ async def get_app_setting(key: str, session: AsyncSession = Depends(get_db)):
 @setting_router.put("/settings/app")
 async def upsert_app_setting(
     data: AppSettingSchema,
-    session: AsyncSession = Depends(get_db),
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
 ):
     """Create or update a single app setting."""
-    result = await SettingService.upsert_setting(data.model_dump(), session)
+    result = await setting_service.upsert_setting(data.model_dump())
     return response(data=result, message="Setting saved successfully")
 
 
 @setting_router.put("/settings/app/bulk")
 async def bulk_upsert_app_settings(
     data: AppSettingBulkSchema,
-    session: AsyncSession = Depends(get_db),
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
 ):
     """Bulk create/update app settings."""
     settings_list = [s.model_dump() for s in data.settings]
-    result = await SettingService.bulk_upsert_settings(settings_list, session)
+    result = await setting_service.bulk_upsert_settings(settings_list)
     return response(data=result, message="Settings saved successfully")
 
 
 @setting_router.delete("/settings/app/{key}")
-async def delete_app_setting(key: str, session: AsyncSession = Depends(get_db)):
+async def delete_app_setting(
+    key: str, 
+    setting_service: SettingService = Depends(get_service(SettingService, AppSettingRepository))
+):
     """Delete an app setting by key."""
-    deleted = await SettingService.delete_setting(key, session)
+    deleted = await setting_service.delete_setting(key)
     if not deleted:
         return error_response(message="Setting not found", status_code=404)
     return response(data=None, message="Setting deleted successfully")
