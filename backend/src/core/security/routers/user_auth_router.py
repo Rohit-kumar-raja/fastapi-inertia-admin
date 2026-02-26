@@ -81,7 +81,7 @@ async def forgot_password(
 
     serializer = URLSafeTimedSerializer(settings.APP_SECRET_KEY)
     token = serializer.dumps(data.email, salt="password-reset-salt")
-    reset_link = f"{request.url.scheme}://{request.url.netloc}/login/reset-password?token={token}&email={data.email}"
+    reset_link = f"{request.url.scheme}://{request.url.netloc}/admin/login/reset-password?token={token}&email={data.email}"
 
     # Actually we need uow for sending email to fetch SMTP config
     await send_reset_password_email(data.email, reset_link, user_service.uow.session)

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useToast } from 'primevue';
 import { faBolt, faLock, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import axios from 'axios';
+import { admin } from '@/core';
 
 defineOptions({
     layout: null
@@ -15,36 +16,36 @@ const props = defineProps<{
     email: string;
 }>();
 
-const form = useForm({
-    token: props.token,
-    email: props.email,
-    password: '',
-    password_confirmation: '',
-});
-
+const password = ref('');
+const password_confirmation = ref('');
 const toast = useToast();
 const loading = ref(false);
 
-const handleResetPassword = () => {
+const handleResetPassword = async () => {
     loading.value = true;
-    form.post('/login/reset-password', {
-        onSuccess: (page) => {
-            toast.add({ severity: 'success', summary: 'Success', detail: page.props.message || 'Password reset successfully. You can now login.', life: 5000 });
-            // Optionally redirect to login, but inertia might handle it or user can click link
-        },
-        onError: (errors) => {
-            const errorMessage = Object.values(errors)[0] || 'An error occurred. Please try again.';
-            toast.add({
-                severity: 'error',
-                summary: 'Reset Failed',
-                detail: errorMessage as string,
-                life: 5000
-            });
-        },
-        onFinish: () => {
-            loading.value = false;
-        }
-    });
+    try {
+        const response = await axios.post(admin.RESET_PASSWORD, {
+            token: props.token,
+            email: props.email,
+            password: password.value,
+            password_confirmation: password_confirmation.value,
+        });
+        toast.add({ severity: 'success', summary: 'Success', detail: response.data.message || 'Password reset successfully.', life: 3000 });
+        // Redirect to login after short delay
+        setTimeout(() => {
+            router.visit('/admin/login');
+        }, 1500);
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || 'An error occurred. Please try again.';
+        toast.add({
+            severity: 'error',
+            summary: 'Reset Failed',
+            detail: errorMessage,
+            life: 5000
+        });
+    } finally {
+        loading.value = false;
+    }
 };
 </script>
 
@@ -98,7 +99,7 @@ const handleResetPassword = () => {
                 class="relative w-full max-w-md bg-white dark:bg-surface-900 p-8 md:p-10 rounded-3xl shadow-xl border border-surface-100 dark:border-surface-800 animate-fade-in-up">
 
                 <div class="mb-4">
-                    <Link href="/login"
+                    <Link href="/admin/login"
                         class="inline-flex items-center gap-2 text-sm font-medium text-surface-500 hover:text-primary-600 transition-colors mb-6">
                         <font-awesome-icon :icon="faArrowLeft" />
                         Back to Login
@@ -113,7 +114,7 @@ const handleResetPassword = () => {
                     <h2 class="text-3xl font-bold text-surface-900 dark:text-surface-0 mb-2 tracking-tight">Create New
                         Password</h2>
                     <p class="text-surface-500 dark:text-surface-400">Please enter your new password below for {{
-                        form.email }}.</p>
+                        props.email }}.</p>
                 </div>
 
                 <form @submit.prevent="handleResetPassword" class="flex flex-col gap-5">
@@ -129,14 +130,12 @@ const handleResetPassword = () => {
                                     <font-awesome-icon :icon="faLock"
                                         class="text-surface-400 dark:text-surface-500 group-focus-within:text-primary-500 transition-colors" />
                                 </InputIcon>
-                                <Password id="password" v-model="form.password" :feedback="true" toggleMask
-                                    :invalid="!!form.errors.password" placeholder="••••••••" required
+                                <Password id="password" v-model="password" :feedback="true" toggleMask
+                                    placeholder="••••••••" required
                                     inputClass="w-full pl-10 py-3 rounded-xl! border-surface-300! dark:border-surface-700! focus:border-primary-500! focus:ring-4! focus:ring-primary-100! dark:focus:ring-primary-900/30! transition-all duration-300"
                                     class="w-full [&>input]:w-full" />
                             </IconField>
                         </div>
-                        <small v-if="form.errors.password" class="text-red-500 text-xs mt-1 animate-shake">{{
-                            form.errors.password }}</small>
                     </div>
 
                     <!-- Confirm Password Input -->
@@ -150,16 +149,12 @@ const handleResetPassword = () => {
                                     <font-awesome-icon :icon="faLock"
                                         class="text-surface-400 dark:text-surface-500 group-focus-within:text-primary-500 transition-colors" />
                                 </InputIcon>
-                                <Password id="password_confirmation" v-model="form.password_confirmation"
-                                    :feedback="false" toggleMask :invalid="!!form.errors.password_confirmation"
-                                    placeholder="••••••••" required
+                                <Password id="password_confirmation" v-model="password_confirmation" :feedback="false"
+                                    toggleMask placeholder="••••••••" required
                                     inputClass="w-full pl-10 py-3 rounded-xl! border-surface-300! dark:border-surface-700! focus:border-primary-500! focus:ring-4! focus:ring-primary-100! dark:focus:ring-primary-900/30! transition-all duration-300"
                                     class="w-full [&>input]:w-full" />
                             </IconField>
                         </div>
-                        <small v-if="form.errors.password_confirmation"
-                            class="text-red-500 text-xs mt-1 animate-shake">{{
-                                form.errors.password_confirmation }}</small>
                     </div>
 
                     <!-- Submit Button -->

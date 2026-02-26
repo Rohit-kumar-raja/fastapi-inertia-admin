@@ -16,7 +16,7 @@ export const admin = {
     SETTINGS_COMPANY_API: `/admin/settings/company`,
     SETTINGS_APP_API: `/admin/settings/app`,
     SETTINGS_APP_BULK_API: `/admin/settings/app/bulk`,
-    FORGET_PASSWORD:`/admin/forgot-password`,
-    RESET_PASSWORD:`/admin/reset-password`
+    FORGET_PASSWORD: `/admin/login/forgot-password`,
+    RESET_PASSWORD: `/admin/login/reset-password`
 
 }

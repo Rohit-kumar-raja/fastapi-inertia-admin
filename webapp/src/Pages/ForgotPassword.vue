@@ -1,44 +1,40 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useToast } from 'primevue';
 import { faBolt, faEnvelope, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import axios from 'axios';
+import { admin } from '@/core';
 
 defineOptions({
     layout: null
 });
 
-const form = useForm({
-    email: '',
-});
-
+const email = ref('');
 const toast = useToast();
 const loading = ref(false);
+const statusMessage = ref('');
 
-const handleForgotPassword = () => {
+const handleForgotPassword = async () => {
     loading.value = true;
-    form.post('/admin/login/forgot-password', {
-        onSuccess: (page) => {
-            // Check if there is a message in the flash/props, assuming there is a generic success message
-            toast.add({ severity: 'success', summary: 'Success', detail: page.props.message || 'If your email is registered, you will receive a reset link.', life: 5000 });
-            form.reset('email');
-        },
-        onError: (errors) => {
-            // Check if there's a specific error message
-            const errorMessage = Object.values(errors)[0] || 'An error occurred. Please try again.';
-            toast.add({
-                severity: 'error',
-                summary: 'Failed',
-                detail: errorMessage as string,
-                life: 5000
-            });
-        },
-        onFinish: () => {
-            loading.value = false;
-        }
-    });
+    statusMessage.value = '';
+    try {
+        const response = await axios.post(admin.FORGET_PASSWORD, { email: email.value });
+        statusMessage.value = response.data.message || 'If your email is registered, you will receive a reset link.';
+        toast.add({ severity: 'success', summary: 'Success', detail: statusMessage.value, life: 5000 });
+        email.value = '';
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || 'An error occurred. Please try again.';
+        toast.add({
+            severity: 'error',
+            summary: 'Failed',
+            detail: errorMessage,
+            life: 5000
+        });
+    } finally {
+        loading.value = false;
+    }
 };
 </script>
 
@@ -77,7 +73,8 @@ const handleForgotPassword = () => {
                 </h1>
 
                 <p class="text-lg text-surface-200 font-light leading-relaxed mb-8">
-                    Lost your password? No worries, we'll send you a link to get back into your account safely and securely.
+                    Lost your password? No worries, we'll send you a link to get back into your account safely and
+                    securely.
                 </p>
             </div>
 
@@ -93,7 +90,8 @@ const handleForgotPassword = () => {
                 class="relative w-full max-w-md bg-white dark:bg-surface-900 p-8 md:p-10 rounded-3xl shadow-xl border border-surface-100 dark:border-surface-800 animate-fade-in-up">
 
                 <div class="mb-4">
-                    <Link href="/admin/login" class="inline-flex items-center gap-2 text-sm font-medium text-surface-500 hover:text-primary-600 transition-colors mb-6">
+                    <Link href="/admin/login"
+                        class="inline-flex items-center gap-2 text-sm font-medium text-surface-500 hover:text-primary-600 transition-colors mb-6">
                         <font-awesome-icon :icon="faArrowLeft" />
                         Back to Login
                     </Link>
@@ -104,8 +102,15 @@ const handleForgotPassword = () => {
                         class="inline-flex lg:hidden mb-4 items-center justify-center w-14 h-14 rounded-xl bg-primary-600 text-white shadow-lg">
                         <font-awesome-icon :icon="faBolt" class="text-2xl" />
                     </div>
-                    <h2 class="text-3xl font-bold text-surface-900 dark:text-surface-0 mb-2 tracking-tight">Forgot Password</h2>
+                    <h2 class="text-3xl font-bold text-surface-900 dark:text-surface-0 mb-2 tracking-tight">Forgot
+                        Password</h2>
                     <p class="text-surface-500 dark:text-surface-400">Enter your email and we'll send a reset link.</p>
+                </div>
+
+                <!-- Success Message -->
+                <div v-if="statusMessage"
+                    class="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-sm">
+                    {{ statusMessage }}
                 </div>
 
                 <form @submit.prevent="handleForgotPassword" class="flex flex-col gap-5">
@@ -113,19 +118,17 @@ const handleForgotPassword = () => {
                     <!-- Email Input -->
                     <div class="flex flex-col gap-2 group">
                         <label for="email"
-                            class="font-medium text-surface-700 dark:text-surface-200 group-focus-within:text-primary-600 transition-colors">Email Address</label>
+                            class="font-medium text-surface-700 dark:text-surface-200 group-focus-within:text-primary-600 transition-colors">Email
+                            Address</label>
                         <IconField>
                             <InputIcon>
                                 <font-awesome-icon :icon="faEnvelope"
                                     class="text-surface-400 dark:text-surface-500 group-focus-within:text-primary-500 transition-colors" />
                             </InputIcon>
-                            <InputText id="email" v-model="form.email" type="email"
+                            <InputText id="email" v-model="email" type="email"
                                 class="w-full pl-10 rounded-xl! border-surface-300! dark:border-surface-700! focus:border-primary-500! focus:ring-4! focus:ring-primary-100! dark:focus:ring-primary-900/30! transition-all duration-300"
-                                :class="{ 'border-red-500! focus:ring-red-100!': form.errors.email }"
                                 placeholder="name@company.com" size="large" required />
                         </IconField>
-                        <small v-if="form.errors.email" class="text-red-500 text-xs mt-1 animate-shake">{{
-                            form.errors.email }}</small>
                     </div>
 
                     <!-- Submit Button -->
