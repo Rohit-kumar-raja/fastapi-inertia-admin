@@ -19,7 +19,7 @@ const loading = ref(false);
 
 const handleForgotPassword = () => {
     loading.value = true;
-    form.post('/login/forgot-password', {
+    form.post('/admin/login/forgot-password', {
         onSuccess: (page) => {
             // Check if there is a message in the flash/props, assuming there is a generic success message
             toast.add({ severity: 'success', summary: 'Success', detail: page.props.message || 'If your email is registered, you will receive a reset link.', life: 5000 });
@@ -93,7 +93,7 @@ const handleForgotPassword = () => {
                 class="relative w-full max-w-md bg-white dark:bg-surface-900 p-8 md:p-10 rounded-3xl shadow-xl border border-surface-100 dark:border-surface-800 animate-fade-in-up">
 
                 <div class="mb-4">
-                    <Link href="/login" class="inline-flex items-center gap-2 text-sm font-medium text-surface-500 hover:text-primary-600 transition-colors mb-6">
+                    <Link href="/admin/login" class="inline-flex items-center gap-2 text-sm font-medium text-surface-500 hover:text-primary-600 transition-colors mb-6">
                         <font-awesome-icon :icon="faArrowLeft" />
                         Back to Login
                     </Link>
