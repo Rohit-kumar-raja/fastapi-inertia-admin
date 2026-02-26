@@ -12,6 +12,7 @@ from inertia import (
 from core.config.inertia import inertia_config
 from apps.admin.routes import admin_router
 from core.security.routers import security_router
+from apps.appuser.routes.auth_router import appuser_router
 
 from core.middlewares.rbac_middleware import RBACMiddleware
 
@@ -60,6 +61,7 @@ app.mount(
 
 app.include_router(admin_router)
 app.include_router(security_router)
+app.include_router(appuser_router, prefix="/api", tags=["appuser"])
 
 
 @app.on_event("startup")
