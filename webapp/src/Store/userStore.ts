@@ -45,7 +45,7 @@ export const useUserStore = defineStore('user', () => {
             localStorage.removeItem('user_data');
         }
     }
-    onMounted(fetchUser)
+    // onMounted(fetchUser)
 
     async function login(credentials: any) {
         const response = await axios.post(admin.LOGIN_API, credentials, {

@@ -32,3 +32,14 @@ class UserLoginResponseSchema(BaseModel):
 
     user: UserDetailsResponseSchema
     permissions: List[str] = Field(default=[], description="List of user permission names")
+
+
+class ForgotPasswordSchema(BaseModel):
+    email: str = Field(..., description="Email address")
+
+
+class ResetPasswordSchema(BaseModel):
+    token: str = Field(..., description="Reset password token")
+    email: str = Field(..., description="Email address")
+    password: str = Field(..., description="New password", min_length=8)
+    password_confirmation: str = Field(..., description="Confirm new password", min_length=8)

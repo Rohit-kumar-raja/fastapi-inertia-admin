@@ -100,10 +100,15 @@ class PermissionService:
         Returns a summary of created, existing, and deactivated permissions.
         """
         from fastapi.routing import APIRoute
+        from ...middlewares.rbac_middleware import SKIP_PREFIXES, SKIP_ROUTE_NAMES
 
         route_names = set()
         for route in app.routes:
             if isinstance(route, APIRoute) and route.name:
+                if route.name in SKIP_ROUTE_NAMES:
+                    continue
+                if any(route.path.startswith(prefix) for prefix in SKIP_PREFIXES):
+                    continue
                 route_names.add(route.name)
 
         # Get existing permissions

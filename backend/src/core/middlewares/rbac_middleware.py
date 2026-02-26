@@ -35,6 +35,9 @@ SKIP_PATHS = {
 # Path prefixes that should never be permission-checked
 SKIP_PREFIXES = (
     "/admin/login",
+    "/admin/notifications",
+    "/admin/settings/profile",
+    "/admin/settings/password",
     "/static",
     "/assets",
     "/api/v1/login",

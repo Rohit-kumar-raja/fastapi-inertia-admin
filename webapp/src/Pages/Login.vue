@@ -4,6 +4,7 @@ import { useUserStore } from '@/Store/userStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useToast } from 'primevue';
 import { faBolt, faUser, faLock, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { Link } from '@inertiajs/vue3';
 
 defineOptions({
     layout: null
@@ -146,9 +147,10 @@ const handleLogin = async () => {
                         <div class="flex justify-between items-center">
                             <label for="password"
                                 class="font-medium text-surface-700 dark:text-surface-200 group-focus-within:text-primary-600 transition-colors">Password</label>
-                            <a href="#"
-                                class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 transition-colors hover:underline">Forgot
-                                password?</a>
+                            <Link href="/login/admin/forgot-password"
+                                class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 transition-colors hover:underline">
+                                Forgot
+                                password?</Link>
                         </div>
                         <div class="w-full">
                             <IconField>
